@@ -1,0 +1,1094 @@
+/* Base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Generic hidden class */
+.hidden {
+  display: none !important;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  font-family: 'Inter', sans-serif;
+  background-color: #F4F3F2; /* lunar-white */
+  color: #211338; /* deep-night text */
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3OLi4ubm5uVlZWPj4+NjY19fX2JiYl/f39ra2uRkZGZmZlpaWmXl5dvb29xcXGTk5NnZ2c8TV1PAAAAAnRSTlMAAHaTzP/AAAArSURBVHichdVoBQEwDACx9d5/B5uN8wYwY4AEMeCvj391rIQfgdD3H98eA4gAgQDvYgIZwQyqAAAAAElFTkSuQmCC");
+  background-size: 32px 32px;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Header */
+#header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: rgba(244, 243, 242, 0.8);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#header .logo {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: #4F2A91; /* royal-purple */
+  letter-spacing: 0.04em;
+}
+
+#header .constellation {
+  flex: 1;
+  height: 4px;
+  margin: 0 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* animated dots in header */
+#header .constellation::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 200%;
+  height: 4px;
+  background-image: radial-gradient(#4F2A91 25%, transparent 25%), radial-gradient(#E4E0EC 25%, transparent 25%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px;
+  animation: slide 10s linear infinite;
+}
+
+@keyframes slide {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+#header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon-button,
+.primary-btn,
+.secondary-btn {
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+.icon-button {
+  background: none;
+  font-size: 1.2rem;
+}
+
+.primary-btn {
+  background-color: #4F2A91;
+  color: #F4F3F2;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.primary-btn:hover,
+.primary-btn:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(79, 42, 145, 0.3);
+}
+
+.secondary-btn {
+  background-color: #E4E0EC;
+  color: #4F2A91;
+  padding: 0.4rem 0.8rem;
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+}
+
+.secondary-btn:hover,
+.secondary-btn:focus {
+  background-color: #d1c8e4;
+}
+
+/* Mobile only utility class */
+.mobile-only {
+  display: none;
+}
+
+@media(max-width: 767px) {
+  /* Hide sidebar on small screens and show hamburger */
+  #sidebar {
+    display: none !important;
+  }
+  .mobile-only {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #content {
+    margin-left: 0;
+  }
+}
+
+/* Mobile navigation overlay */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(33, 19, 56, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1500;
+}
+
+.mobile-menu.hidden {
+  display: none;
+}
+
+.mobile-menu-content {
+  background-color: #F4F3F2;
+  color: #211338;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  width: 90%;
+  max-width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.mobile-menu-content nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mobile-menu-content nav li button {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border-radius: 9999px;
+}
+
+/* Sidebar */
+#sidebar {
+  position: fixed;
+  top: 64px;
+  bottom: 0;
+  left: 0;
+  width: 200px;
+  background-color: #211338;
+  color: #F4F3F2;
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+#sidebar.hidden {
+  display: none;
+}
+
+#sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-btn {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  color: inherit;
+  border: none;
+  font-weight: 600;
+  border-radius: 0 9999px 9999px 0;
+  transition: background-color 0.2s;
+}
+
+.sidebar-btn.active,
+.sidebar-btn:hover,
+.sidebar-btn:focus {
+  background-color: #4F2A91;
+}
+
+/* Header user info */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+.user-info span {
+  font-weight: 600;
+}
+
+/* Campus section visuals */
+.campus-section {
+  width: 100%;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.campus-section .campus-img {
+  width: 100%;
+  max-width: 1000px;
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Course content layout tweaks */
+.course-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chapter-info {
+  margin-bottom: 0.5rem;
+}
+
+.video-container video {
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Admin upload buttons under video */
+.admin-upload-section {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.admin-upload-section.hidden {
+  display: none;
+}
+
+/* Main content */
+#content {
+  margin-left: 0;
+  padding: 1rem;
+  min-height: calc(100vh - 80px);
+}
+
+@media(min-width: 768px) {
+  #content {
+    margin-left: 200px;
+  }
+}
+
+/* Home view */
+#home-view {
+  text-align: center;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+#home-view .hero {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  min-height: 400px;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Hero background: cosmic silhouette */
+.hero-bg {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120%;
+  height: 120%;
+  background-image: url('hero.png');
+  background-size: cover;
+  background-position: center bottom;
+  opacity: 0.8;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Container for hero text and button */
+.hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+}
+
+/* Hero text styling on dark background */
+.hero-content h1,
+.hero-content p {
+  color: #F4F3F2;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+
+#home-view h1 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  font-size: 2.5rem;
+  color: #4F2A91;
+  margin-bottom: 1rem;
+}
+
+#home-view p {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+#home-login-btn {
+  margin-top: 1rem;
+}
+
+.info-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+@media(min-width: 640px) {
+  .info-cards {
+    flex-direction: row;
+  }
+}
+
+.info-card {
+  flex: 1;
+  background-color: #E4E0EC;
+  padding: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.info-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.info-card h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.info-card p {
+  margin-bottom: 0.5rem;
+}
+
+.info-card a {
+  color: #4F2A91;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* Course view: visibility controlled by .hidden class */
+/* default display will be block; .hidden class hides it */
+
+.course-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media(min-width: 1024px) {
+  .course-layout {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.curriculum {
+  width: 100%;
+  max-width: 300px;
+  background-color: #E4E0EC;
+  padding: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+@media(min-width: 1024px) {
+  .curriculum {
+    position: sticky;
+    top: 80px;
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+}
+
+.curriculum .module {
+  margin-bottom: 1rem;
+}
+
+.module-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chapter-list {
+  margin-left: 0.5rem;
+  display: none;
+}
+
+.chapter-list.active {
+  display: block;
+}
+
+.chapter-item {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.chapter-item.active,
+.chapter-item:hover {
+  background-color: #d1c8e4;
+}
+
+.course-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Video container: limit height so the preview doesn't dominate the page */
+.video-container {
+  position: relative;
+  width: 100%;
+  background-color: #000;
+  border-radius: 1rem;
+  overflow: hidden;
+  max-height: 320px;
+}
+
+.video-container video {
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  border-radius: 1rem;
+}
+
+.chapter-info h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  color: #4F2A91;
+}
+
+/* Chapter description styling */
+.chapter-description {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  background-color: #F4F3F2;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  color: #211338;
+  font-size: 0.9rem;
+}
+
+/* Nested lists inside chapter descriptions */
+.chapter-description ul {
+  margin-left: 1.25rem;
+  list-style-type: disc;
+}
+.chapter-description li {
+  margin-bottom: 0.25rem;
+}
+
+.pdf-section {
+  margin-top: 0.5rem;
+  background-color: #E4E0EC;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+/* Mentoring view: visibility controlled by .hidden class */
+
+.progress-bar-wrapper {
+  margin: 1rem 0;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 16px;
+  background-color: #E4E0EC;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: #4F2A91;
+  width: 0;
+  transition: width 0.5s;
+}
+
+.sessions-list {
+  list-style: none;
+  padding: 0;
+}
+
+.sessions-list li {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: #E4E0EC;
+}
+
+.sessions-list li.completed {
+  background-color: #e0f7e9;
+  color: #2e7d32;
+}
+
+.sessions-list li .session-icon {
+  margin-right: 0.5rem;
+}
+
+/* Mentor containers for teacher and admin views */
+.mentor-container .mentor-item {
+  background-color: #E4E0EC;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.mentor-container .mentor-item .mentor-header {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+.mentor-container ul {
+  list-style: none;
+  padding-left: 1rem;
+}
+.mentor-container ul li {
+  margin-bottom: 0.25rem;
+}
+
+/*
+ * Agenda styles
+ * The agenda displays school events with date, title and description. Each event
+ * is shown as a card with a distinct header for the date and title. Students
+ * can only view events, whereas teachers and admins will also see action
+ * buttons for editing or deleting an event.
+ */
+.event-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+/* Individual event item */
+.event-item {
+  background-color: #E4E0EC;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Header containing date and title */
+.event-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+/* Date styling within event header */
+.event-date {
+  color: #4F2A91;
+  margin-right: 0.5rem;
+  white-space: nowrap;
+}
+
+/* Title styling within event header */
+.event-title {
+  flex: 1;
+}
+
+/* Description below the header */
+.event-desc {
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+/* Action buttons for teachers/admins */
+.event-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+.event-actions button {
+  font-size: 0.85rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* When there are no events, style the empty item with muted text */
+.event-item.empty {
+  background-color: transparent;
+  color: #666;
+  text-align: center;
+  box-shadow: none;
+}
+
+/* Calendar container for agenda (FullCalendar). Ensure it fills available space without overflow. */
+.calendar-container {
+  margin-top: 0.5rem;
+  width: 100%;
+  flex: 1;
+  /* Adjust height so the month view fits in the viewport without scrolling. 200px accounts for header and topbars. */
+  /* Occupy most of the viewport height so the entire month fits without page scroll. Adjust the subtraction value to account for header and topbar heights. */
+  /* Subtract extra space for header, topbar and fixed footer */
+  height: calc(100vh - 200px);
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Agenda layout inspired by Google Calendar */
+.agenda-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Left sidebar containing create button, mini calendar and calendar list */
+.agenda-left {
+  width: 260px;
+  background-color: #F4F3F2;
+  border-right: 1px solid #e0dfe5;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Create button takes full width */
+#create-event-btn {
+  width: 100%;
+}
+
+/* Mini calendar styling */
+.mini-calendar {
+  /* ensure mini calendar doesn't grow too large */
+  min-height: 200px;
+  max-height: 300px;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 0.5rem;
+  /* reduce font size for compact mini calendar */
+  font-size: 0.7rem;
+}
+
+/* Fine-tune mini calendar cell sizes */
+.mini-calendar .fc-daygrid-day-frame {
+  padding: 0.1rem;
+}
+.mini-calendar .fc-col-header-cell-cushion {
+  padding: 0.1rem 0;
+  font-size: 0.6rem;
+}
+
+/* Calendar list section */
+.calendar-list-section h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #4F2A91;
+}
+.calendars-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.calendars-list li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+.calendars-list input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+/* Main agenda area */
+/* Main agenda area fills the remaining space and keeps the calendar visible without scrolling */
+.agenda-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Top bar above the calendar (custom control buttons) */
+.calendar-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.topbar-left,
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.calendar-current-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-left: 0.75rem;
+  color: #4F2A91;
+}
+
+/* Search input styling */
+.search-input {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+}
+.search-input:focus {
+  outline: none;
+  border-color: #4F2A91;
+  box-shadow: 0 0 0 2px rgba(79,42,145,0.2);
+}
+
+/* Settings button matches other icon buttons */
+#agenda-settings-btn.icon-button {
+  font-size: 1rem;
+}
+
+/* Ensure agenda view can contain absolutely positioned background */
+#agenda-view {
+  position: relative;
+  overflow: hidden;
+  /* Occupy remaining viewport height minus header to avoid scrolling */
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure content overlays the animated blob */
+#agenda-view .agenda-container,
+#agenda-view .agenda-main {
+  position: relative;
+  z-index: 1;
+}
+
+/* Animated abstract blob in agenda background */
+.agenda-blob {
+  position: absolute;
+  top: -20vh;
+  left: -20vw;
+  width: 140vw;
+  height: 140vh;
+  /* radial gradient for a soft, violet blob. Increase opacity for better visibility */
+  background: radial-gradient(circle at 50% 50%, rgba(164, 148, 209, 0.6), rgba(164, 148, 209, 0.2));
+  border-radius: 50%;
+  z-index: 0;
+  animation: blobAnimate 40s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes blobAnimate {
+  0% {
+    transform: translate(0%, 0%) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translate(10%, 5%) scale(1.1) rotate(10deg);
+  }
+  100% {
+    transform: translate(0%, 0%) scale(1) rotate(0deg);
+  }
+}
+
+/* Adjust FullCalendar theme to better match our colour palette */
+.fc {
+  font-family: 'Inter', sans-serif;
+  color: #211338;
+}
+.fc-toolbar-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.fc-button {
+  background-color: #E4E0EC;
+  border: none;
+  color: #4F2A91;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+}
+.fc-button:hover,
+.fc-button:focus {
+  background-color: #d1c8e4;
+}
+.fc-button.fc-button-primary {
+  background-color: #4F2A91;
+  color: #F4F3F2;
+}
+.fc-button.fc-button-primary:hover,
+.fc-button.fc-button-primary:focus {
+  background-color: #40217b;
+}
+
+/* Admin view: visibility controlled by .hidden class */
+
+.module-list {
+  margin-top: 1rem;
+}
+
+.module-item {
+  background-color: #E4E0EC;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.module-item button {
+  margin-right: 0.5rem;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background-color: #F4F3F2;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Login form layout */
+#login-form label,
+#login-form input,
+#login-form button {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+#login-form input {
+  padding: 0.4rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+}
+
+#login-form button {
+  margin-top: 0.5rem;
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.ai-content {
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 70vh;
+}
+
+.ai-chat {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #E4E0EC;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+.ai-chat p {
+  margin-bottom: 0.5rem;
+}
+
+.ai-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ai-form input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+}
+
+/* Language selector */
+.lang-fab {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background-color: #4F2A91;
+  color: #F4F3F2;
+  border-radius: 9999px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+
+.lang-selector {
+  position: fixed;
+  bottom: 4.5rem;
+  right: 1rem;
+  background-color: #F4F3F2;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.lang-selector.hidden {
+  display: none;
+}
+
+.lang-selector button {
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-weight: 600;
+}
+
+.lang-selector button:hover,
+.lang-selector button:focus {
+  background-color: #E4E0EC;
+}
+
+/* Footer */
+#footer {
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  background-color: rgba(244, 243, 242, 0.9);
+  backdrop-filter: blur(4px);
+  /* Fix footer at the bottom of the viewport so it doesn't push the agenda down */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+/* User management styles */
+.user-list {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.user-item {
+  background-color: #E4E0EC;
+  color: #4F2A91;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.user-item span {
+  font-weight: 600;
+}
+
+.user-item .user-actions {
+  display: flex;
+  gap: 0.5rem;
+}

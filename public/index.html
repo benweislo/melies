@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Méliès Online</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- FullCalendar CSS and JS for Agenda view (replicates Google Calendar features) -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js" defer></script>
+  <!-- Font Awesome for official icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header id="header">
+    <div class="logo">Méliès</div>
+    <div class="constellation" aria-hidden="true"></div>
+    <div class="header-right">
+      <button id="lang-toggle" class="icon-button" aria-label="Change language" title="Changer la langue">
+        <i class="fa-solid fa-globe"></i>
+      </button>
+      <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook" class="icon-button">
+        <i class="fa-brands fa-facebook-f"></i>
+      </a>
+      <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram" class="icon-button">
+        <i class="fa-brands fa-instagram"></i>
+      </a>
+      <a href="https://linkedin.com" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn" class="icon-button">
+        <i class="fa-brands fa-linkedin-in"></i>
+      </a>
+      <button id="apply-btn" class="primary-btn">Candidater</button>
+      <!-- Mobile menu button (hamburger) visible on small screens -->
+      <button id="mobile-menu-btn" class="icon-button mobile-only" aria-label="Menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <!-- User info section displayed after login -->
+      <div id="user-info" class="user-info hidden">
+        <span id="user-label"></span>
+        <!-- Buttons to change or end the current session -->
+        <button id="change-account-btn" class="secondary-btn" title="Changer de compte">Changer de compte</button>
+        <button id="logout-btn" class="secondary-btn" title="Se déconnecter">Se déconnecter</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar for authenticated users -->
+  <aside id="sidebar" class="hidden">
+    <nav>
+      <ul>
+        <li><button id="nav-courses" class="sidebar-btn active">Cours</button></li>
+        <li><button id="nav-mentoring" class="sidebar-btn">Mentorat</button></li>
+        <!-- Agenda nav for all roles -->
+        <li><button id="nav-agenda" class="sidebar-btn">Agenda</button></li>
+        <li id="admin-nav-li" class="hidden"><button id="nav-admin" class="sidebar-btn">Admin</button></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main content area -->
+  <main id="content">
+    <!-- Home View (unauthenticated) -->
+    <section id="home-view">
+      <div class="hero">
+        <!-- Decorative hero background with cosmic silhouette.  The image lives in melies/hero.png and is styled via CSS -->
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="hero-content">
+          <h1 id="home-title">École Méliès en Ligne</h1>
+          <p id="home-subtitle">Un monde de créativité vous attend</p>
+          <p id="home-description">Découvrez nos cours d'animation et développez votre talent avec des mentors de renommée.</p>
+          <button id="home-login-btn" class="primary-btn">Connexion</button>
+        </div>
+      </div>
+      <div class="info-cards">
+        <div class="info-card" id="card-courses">
+          <div class="card-icon">🎓</div>
+          <h3 id="card-courses-title">Cours en ligne</h3>
+          <p id="card-courses-desc">Accédez à des cours de qualité, guidés par des professionnels de l'industrie.</p>
+          <a href="#" id="card-courses-link">En savoir plus</a>
+        </div>
+        <div class="info-card" id="card-mentoring">
+          <div class="card-icon">🤝</div>
+          <h3 id="card-mentoring-title">Mentorat Premium</h3>
+          <p id="card-mentoring-desc">Progressez avec un mentor qui vous accompagnera tout au long de votre parcours.</p>
+          <a href="#" id="card-mentoring-link">En savoir plus</a>
+        </div>
+      </div>
+    <!-- Visual from the official École Georges Méliès website -->
+    <div id="campus-section" class="campus-section">
+      <img src="campus.jpg" alt="Vue du campus de l'École Méliès" class="campus-img" />
+    </div>
+    </section>
+
+    <!-- Course Player View (authenticated) -->
+    <section id="courses-view" class="hidden">
+      <div class="course-layout">
+        <!-- Course curriculum sidebar in main area (desktop) -->
+        <div id="curriculum" class="curriculum"></div>
+        <!-- Chapter details, video player and admin upload section -->
+        <div class="course-content">
+          <!-- Chapter information displayed above the video -->
+          <div class="chapter-info">
+            <h2 id="chapter-title"></h2>
+            <p id="module-name"></p>
+            <!-- Chapter description text inserted dynamically -->
+            <p id="chapter-description" class="chapter-description"></p>
+            <div id="pdf-section" class="pdf-section hidden">
+              <p id="pdf-desc"></p>
+              <button id="download-pdf-btn" class="secondary-btn">Télécharger le PDF</button>
+            </div>
+            <button id="ask-ai-btn" class="secondary-btn">Demander à l'IA</button>
+          </div>
+          <!-- Video container displayed below the chapter info -->
+          <div class="video-container">
+            <video id="course-video" controls></video>
+          </div>
+          <!-- Admin upload controls shown only for admins -->
+          <div id="admin-upload-section" class="admin-upload-section hidden">
+            <button id="admin-upload-video-btn" class="secondary-btn">Téléverser vidéo</button>
+            <button id="admin-upload-pdf-btn" class="secondary-btn">Téléverser PDF</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mentoring View (authenticated) -->
+    <section id="mentoring-view" class="hidden">
+      <h2 id="mentoring-title">Progression Mentorat</h2>
+      <div class="progress-bar-wrapper">
+        <div id="progress-bar" class="progress-bar">
+          <div id="progress-bar-fill" class="progress-bar-fill"></div>
+        </div>
+        <p id="progress-text"></p>
+      </div>
+      <ul id="sessions-list" class="sessions-list"></ul>
+      <!-- Containers for teacher and admin mentoring views -->
+      <div id="teacher-mentor-container" class="hidden"></div>
+      <div id="admin-mentor-container" class="hidden"></div>
+    </section>
+
+    <!-- Agenda View (authenticated) -->
+    <section id="agenda-view" class="hidden">
+      <!-- Background abstract blob for subtle motion -->
+      <div class="agenda-blob" aria-hidden="true"></div>
+      <!-- Title for the agenda section (translated) -->
+      <h2 id="agenda-title">Agenda</h2>
+      <!-- Comprehensive agenda layout inspired by Google Calendar -->
+      <div class="agenda-container">
+        <!-- Left sidebar with create button, mini calendar, and calendar list -->
+        <aside id="agenda-left" class="agenda-left">
+          <!-- Create event button: visible only for teacher and admin -->
+          <button id="create-event-btn" class="primary-btn hidden">Créer</button>
+          <!-- List of calendars (placeholder for future integration) -->
+          <div class="calendar-list-section">
+            <h4 id="my-calendars-title">Mes agendas</h4>
+            <ul id="my-calendars-list" class="calendars-list">
+              <li><label><input type="checkbox" id="default-calendar-checkbox" checked> <span id="default-calendar-name">Agenda Méliès</span></label></li>
+            </ul>
+          </div>
+        </aside>
+        <!-- Main agenda area with custom top bar and FullCalendar instance -->
+        <div class="agenda-main">
+          <div class="calendar-topbar">
+            <div class="topbar-left">
+              <button id="agenda-today-btn" class="secondary-btn">Aujourd'hui</button>
+              <button id="agenda-prev-btn" class="icon-button" aria-label="Précédent">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <button id="agenda-next-btn" class="icon-button" aria-label="Suivant">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+              <h3 id="calendar-current-title" class="calendar-current-title"></h3>
+            </div>
+            <div class="topbar-right">
+              <button id="agenda-day-btn" class="secondary-btn">Jour</button>
+              <button id="agenda-week-btn" class="secondary-btn">Semaine</button>
+              <button id="agenda-month-btn" class="secondary-btn">Mois</button>
+              <button id="agenda-list-btn" class="secondary-btn">Planning</button>
+              <input type="text" id="agenda-search" class="search-input" placeholder="Rechercher…" />
+              <button id="agenda-settings-btn" class="icon-button" aria-label="Paramètres">
+                <i class="fa-solid fa-gear"></i>
+              </button>
+            </div>
+          </div>
+          <!-- Primary calendar view rendered by FullCalendar -->
+          <div id="calendar" class="calendar-container"></div>
+        </div>
+      </div>
+      <!-- Fallback list of events for non‑JS or older feature; kept hidden when calendar loads -->
+      <ul id="event-list" class="event-list hidden"></ul>
+    </section>
+
+    <!-- Admin View (authenticated admin only) -->
+    <section id="admin-view" class="hidden">
+      <h2 id="admin-title">Gestion des Modules</h2>
+      <button id="add-module-btn" class="secondary-btn">Ajouter un Module</button>
+      <div id="module-list" class="module-list"></div>
+
+      <!-- User Management Section (admin only) -->
+      <h3 id="user-management-title">Gestion des Utilisateurs</h3>
+      <button id="add-user-btn" class="secondary-btn">Ajouter un utilisateur</button>
+      <div id="user-list" class="user-list"></div>
+    </section>
+  </main>
+
+  <!-- Auth Modal -->
+  <div id="auth-modal" class="modal hidden" role="dialog" aria-labelledby="auth-title" aria-modal="true">
+    <div class="modal-content">
+      <button class="modal-close" id="auth-close">×</button>
+      <h2 id="auth-title">Connexion</h2>
+      <form id="login-form">
+        <label for="email">Email</label>
+        <!-- Use text input instead of email to allow usernames without '@' -->
+        <input type="text" id="email" required />
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" required />
+        <button type="submit" class="primary-btn">Se connecter</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- AI Explainer Modal -->
+  <div id="ai-modal" class="modal hidden" role="dialog" aria-labelledby="ai-title" aria-modal="true">
+    <div class="modal-content ai-content">
+      <button class="modal-close" id="ai-close">×</button>
+      <h2 id="ai-title">Assistant IA Méliès</h2>
+      <div id="ai-chat" class="ai-chat"></div>
+      <form id="ai-form" class="ai-form">
+        <input type="text" id="ai-input" placeholder="Posez votre question..." required />
+        <button type="submit" class="primary-btn">Envoyer</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Language Selector (bottom right) -->
+  <div id="lang-selector" class="lang-selector hidden">
+    <button data-lang="fr">Français</button>
+    <button data-lang="en">English</button>
+    <button data-lang="es">Español</button>
+  </div>
+  <button id="lang-fab" class="lang-fab" aria-label="Language selector">
+    <i class="fa-solid fa-language"></i>
+  </button>
+
+  <footer id="footer">
+    <p>&copy; 2025 École Méliès en Ligne</p>
+  </footer>
+
+  <!-- Mobile navigation overlay (hidden by default) -->
+  <div id="mobile-menu" class="mobile-menu hidden" role="dialog" aria-modal="true">
+    <div class="mobile-menu-content">
+      <button id="mobile-menu-close" class="modal-close" aria-label="Close menu">×</button>
+      <nav>
+        <ul>
+          <li><button id="mobile-nav-courses" class="primary-btn">Cours</button></li>
+          <li><button id="mobile-nav-mentoring" class="primary-btn">Mentorat</button></li>
+          <!-- Agenda option for mobile menu -->
+          <li><button id="mobile-nav-agenda" class="primary-btn">Agenda</button></li>
+          <li id="mobile-admin-li" class="hidden"><button id="mobile-nav-admin" class="primary-btn">Admin</button></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
