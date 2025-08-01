@@ -47,6 +47,13 @@
     </div>
   </header>
 
+  <!-- Global background blobs for subtle animated shapes on all pages -->
+  <div class="global-blobs" aria-hidden="true">
+    <div class="line line1"></div>
+    <div class="line line2"></div>
+    <div class="line line3"></div>
+  </div>
+
   <!-- Sidebar for authenticated users -->
   <aside id="sidebar" class="hidden">
     <nav>
@@ -121,6 +128,11 @@
           <div id="admin-upload-section" class="admin-upload-section hidden">
             <button id="admin-upload-video-btn" class="secondary-btn">Téléverser vidéo</button>
             <button id="admin-upload-pdf-btn" class="secondary-btn">Téléverser PDF</button>
+            <!-- Progress bar for video upload -->
+            <div id="video-upload-progress" class="upload-progress hidden">
+              <div id="video-upload-bar" class="upload-progress-bar"></div>
+              <span id="video-upload-text" class="upload-progress-text">0%</span>
+            </div>
           </div>
         </div>
       </div>
@@ -266,5 +278,11 @@
   </div>
 
   <script src="script.js" defer></script>
+
+  <!-- Hidden file input for video uploads (triggered by upload button) -->
+  <input type="file" id="video-file-input" class="hidden" accept="video/*" />
+
+  <!-- tus-js-client for resumable uploads to Vimeo -->
+  <script src="https://cdn.jsdelivr.net/npm/tus-js-client@latest/dist/tus.min.js"></script>
 </body>
 </html>

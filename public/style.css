@@ -21,6 +21,117 @@ html, body {
   line-height: 1.5;
 }
 
+/* Hide the hero login button (the login will be handled by the header button) */
+#home-login-btn {
+  display: none !important;
+}
+
+/* Global animated background blobs visible on all pages */
+.global-blobs {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.global-blobs .blob {
+  position: absolute;
+  border-radius: 50%;
+  /* Soft violet gradient and blur for a dreamy look */
+  background: radial-gradient(circle at 50% 50%, rgba(164, 148, 209, 0.6), rgba(164, 148, 209, 0.2));
+  filter: blur(80px);
+  animation: blobMove 40s ease-in-out infinite;
+}
+
+/* Individual blob sizes and positions */
+.global-blobs .blob1 {
+  width: 80vw;
+  height: 80vw;
+  top: -20vw;
+  left: -30vw;
+  animation-delay: 0s;
+}
+
+.global-blobs .blob2 {
+  width: 70vw;
+  height: 70vw;
+  top: 40vh;
+  left: 60vw;
+  animation-delay: 5s;
+}
+
+.global-blobs .blob3 {
+  width: 60vw;
+  height: 60vw;
+  top: 80vh;
+  left: -15vw;
+  animation-delay: 10s;
+}
+
+@keyframes blobMove {
+  0% {
+    transform: translate(0%, 0%) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translate(10%, 5%) scale(1.1) rotate(15deg);
+  }
+  100% {
+    transform: translate(0%, 0%) scale(1) rotate(0deg);
+  }
+}
+
+/* Curved line backgrounds replacing the blob shapes */
+.global-blobs .line {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(195, 178, 233, 0.4); /* light violet for minimal interference */
+  background: none;
+  /* Each line will have its own animation defined below */
+}
+
+/* Specific sizes, positions and animations for each line */
+.global-blobs .line1 {
+  width: 120vw;
+  height: 45vw;
+  top: -15vh;
+  left: -60vw;
+  animation: lineMove1 60s ease-in-out infinite;
+}
+.global-blobs .line2 {
+  width: 90vw;
+  height: 35vw;
+  top: 25vh;
+  left: 30vw;
+  animation: lineMove2 70s ease-in-out infinite;
+}
+.global-blobs .line3 {
+  width: 110vw;
+  height: 55vw;
+  top: 70vh;
+  left: -40vw;
+  animation: lineMove3 80s ease-in-out infinite;
+}
+
+@keyframes lineMove1 {
+  0% { transform: rotate(15deg) translate(0%, 0%); }
+  50% { transform: rotate(15deg) translate(5%, 3%); }
+  100% { transform: rotate(15deg) translate(0%, 0%); }
+}
+@keyframes lineMove2 {
+  0% { transform: rotate(-20deg) translate(0%, 0%); }
+  50% { transform: rotate(-20deg) translate(-4%, 4%); }
+  100% { transform: rotate(-20deg) translate(0%, 0%); }
+}
+@keyframes lineMove3 {
+  0% { transform: rotate(25deg) translate(0%, 0%); }
+  50% { transform: rotate(25deg) translate(6%, -2%); }
+  100% { transform: rotate(25deg) translate(0%, 0%); }
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -896,6 +1007,34 @@ a {
 
 .module-list {
   margin-top: 1rem;
+}
+
+/* Progress bar for video upload */
+.upload-progress {
+  margin-top: 0.5rem;
+  position: relative;
+  width: 100%;
+  height: 8px;
+  background-color: #E4E0EC;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.upload-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background-color: #4F2A91;
+  border-radius: 4px;
+  transition: width 0.2s;
+}
+.upload-progress-text {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: #211338;
+  text-align: right;
 }
 
 .module-item {
