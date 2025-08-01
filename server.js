@@ -1,63 +1,173 @@
 const express = require('express');
 const path = require('path');
-const { Vimeo } = require('vimeo');
+const helmet = require('helmet');
+const cors = require('cors');
+const compression = require('compression');
+const rateLimit = require('express-rate-limit');
+const winston = require('winston');
 const dotenv = require('dotenv');
 
-// Load environment variables from .env file in development
+// Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware to parse JSON bodies
-app.use(express.json());
+// Configure Winston logger
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
+  defaultMeta: { service: 'melies-online' },
+  transports: [
+    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'logs/combined.log' }),
+    new winston.transports.Console({
+      format: winston.format.simple()
+    })
+  ]
+});
 
-// Serve all static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Initialize Vimeo client using credentials stored in environment variables
-const vimeoClient = new Vimeo(
-  process.env.VIMEO_CLIENT_ID,
-  process.env.VIMEO_CLIENT_SECRET,
-  process.env.VIMEO_ACCESS_TOKEN
-);
-
-// Endpoint to create a Vimeo upload ticket using the TUS approach
-app.post('/api/create-vimeo-upload', (req, res) => {
-  const { videoSize } = req.body;
-  if (!videoSize) {
-    return res.status(400).json({ error: 'Missing video size' });
-  }
-  vimeoClient.request(
-    {
-      method: 'POST',
-      path: '/me/videos',
-      query: {
-        upload: {
-          approach: 'tus',
-          size: videoSize,
-        },
-        name: 'New Course Video',
-        // Disable viewing until explicitly enabled
-        privacy: { view: 'disable' },
-      },
-    },
-    (error, body) => {
-      if (error) {
-        console.error('Vimeo upload ticket error:', error);
-        return res.status(500).json({ error: 'Failed to create upload ticket' });
-      }
-      const uploadLink = body.upload && body.upload.upload_link;
-      const videoUri = body.uri;
-      if (!uploadLink || !videoUri) {
-        return res.status(500).json({ error: 'Invalid response from Vimeo' });
-      }
-      return res.json({ upload_link: uploadLink, video_uri: videoUri });
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
+      scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https://api.vimeo.com"],
+      mediaSrc: ["'self'", "https://player.vimeo.com", "https://vimeo.com"]
     }
-  );
+  }
+}));
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://melies.herokuapp.com'] 
+    : ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  credentials: true
+}));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 auth requests per windowMs
+  message: 'Too many authentication attempts, please try again later.',
+  skipSuccessfulRequests: true
 });
+
+app.use(limiter);
+app.use('/api/auth', authLimiter);
+
+// Body parsing middleware
+app.use(compression());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Logging middleware
+app.use((req, res, next) => {
+  logger.info(`${req.method} ${req.url}`, {
+    ip: req.ip,
+    userAgent: req.get('User-Agent'),
+    timestamp: new Date().toISOString()
+  });
+  next();
+});
+
+// Serve static files
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0',
+  etag: true
+}));
+
+// Import routes
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+const moduleRoutes = require('./routes/modules');
+const eventRoutes = require('./routes/events');
+const uploadRoutes = require('./routes/upload');
+
+// API routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/modules', moduleRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api/upload', uploadRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  logger.error('Unhandled error:', {
+    error: err.message,
+    stack: err.stack,
+    url: req.url,
+    method: req.method,
+    ip: req.ip
+  });
+
+  if (process.env.NODE_ENV === 'production') {
+    res.status(500).json({
+      error: 'Internal server error',
+      message: 'Something went wrong'
+    });
+  } else {
+    res.status(500).json({
+      error: err.message,
+      stack: err.stack
+    });
+  }
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  if (req.originalUrl.startsWith('/api/')) {
+    res.status(404).json({ error: 'API endpoint not found' });
+  } else {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  }
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM received, shutting down gracefully');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  logger.info('SIGINT received, shutting down gracefully');
+  process.exit(0);
+});
+
+// Start server
+app.listen(PORT, '0.0.0.0', () => {
+  logger.info(`Server running on port ${PORT}`, {
+    environment: process.env.NODE_ENV || 'development',
+    port: PORT
+  });
+});
+
+module.exports = app;
+
