@@ -13,13 +13,12 @@ const logger = winston.createLogger({
   transports: [new winston.transports.Console()]
 });
 
-// Get users data from auth route (temporary solution)
-const authRoute = require('./auth');
+const { getUsersData, setUsersData } = require('../data/users');
 
 // Get all users (admin only)
 router.get('/', authenticateToken, requireRole(['admin']), (req, res) => {
   try {
-    const users = authRoute.getUsersData();
+    const users = getUsersData();
     const safeUsers = users.map(user => {
       const { password, ...safeUser } = user;
       return safeUser;
@@ -58,7 +57,7 @@ router.get('/:id', authenticateToken, (req, res) => {
       });
     }
 
-    const users = authRoute.getUsersData();
+    const users = getUsersData();
     const user = users.find(u => u.id === userId);
 
     if (!user) {
@@ -89,7 +88,7 @@ router.get('/:id', authenticateToken, (req, res) => {
 router.post('/', authenticateToken, requireRole(['admin']), validateUserCreation, async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
-    const users = authRoute.getUsersData();
+    const users = getUsersData();
 
     // Check if username or email already exists
     const existingUser = users.find(u => 
@@ -121,7 +120,7 @@ router.post('/', authenticateToken, requireRole(['admin']), validateUserCreation
     };
 
     users.push(newUser);
-    authRoute.setUsersData(users);
+    setUsersData(users);
 
     logger.info('User created', { 
       newUserId: newUser.id,
@@ -186,7 +185,7 @@ router.put('/:id', authenticateToken, [
       });
     }
 
-    const users = authRoute.getUsersData();
+    const users = getUsersData();
     const userIndex = users.findIndex(u => u.id === userId);
 
     if (userIndex === -1) {
@@ -219,7 +218,7 @@ router.put('/:id', authenticateToken, [
     };
 
     users[userIndex] = updatedUser;
-    authRoute.setUsersData(users);
+    setUsersData(users);
 
     logger.info('User updated', { 
       userId: updatedUser.id,
@@ -262,7 +261,7 @@ router.delete('/:id', authenticateToken, requireRole(['admin']), (req, res) => {
       });
     }
 
-    const users = authRoute.getUsersData();
+    const users = getUsersData();
     const userIndex = users.findIndex(u => u.id === userId);
 
     if (userIndex === -1) {
@@ -282,7 +281,7 @@ router.delete('/:id', authenticateToken, requireRole(['admin']), (req, res) => {
       deletedBy: requestingUserId
     };
 
-    authRoute.setUsersData(users);
+    setUsersData(users);
 
     logger.info('User deleted', { 
       deletedUserId: userId,
@@ -313,7 +312,7 @@ router.delete('/:id', authenticateToken, requireRole(['admin']), (req, res) => {
 // Get user statistics (admin only)
 router.get('/stats/overview', authenticateToken, requireRole(['admin']), (req, res) => {
   try {
-    const users = authRoute.getUsersData();
+    const users = getUsersData();
     const activeUsers = users.filter(u => u.isActive);
     
     const stats = {
