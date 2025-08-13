@@ -13,7 +13,7 @@ const translations = {
     cardMentoringDesc: "Progressez avec un mentor qui vous accompagnera tout au long de votre parcours.",
     cardMentoringLink: "En savoir plus",
     loginBtn: "Connexion",
-    applyBtn: "Connexion",
+    applyBtn: "Candidater",
     askAI: "Demander à l'IA",
     askAIButton: "Demander à l'IA",
     coursesNav: "Cours",
@@ -120,7 +120,7 @@ const translations = {
     cardMentoringDesc: "Advance with a mentor who will accompany you throughout your journey.",
     cardMentoringLink: "Learn more",
     loginBtn: "Login",
-    applyBtn: "Login",
+    applyBtn: "Apply",
     askAI: "Ask AI",
     askAIButton: "Ask AI",
     coursesNav: "Courses",
@@ -227,7 +227,7 @@ const translations = {
     cardMentoringDesc: "Avanza con un mentor que te acompañará a lo largo de tu recorrido.",
     cardMentoringLink: "Saber más",
     loginBtn: "Iniciar sesión",
-    applyBtn: "Iniciar sesión",
+    applyBtn: "Solicitar",
     askAI: "Preguntar a la IA",
     askAIButton: "Preguntar a la IA",
     coursesNav: "Cursos",
@@ -332,7 +332,7 @@ const translations = {
 const users = [
   {
     email: 'nathan.w',
-    password: '1234',
+    password: 'Secret123',
     role: 'student',
     modulesPurchased: [4],
     sessionsTotal: 12,
@@ -343,19 +343,40 @@ const users = [
       { title: 'Session 2', date: '2025-01-15', completed: true },
       { title: 'Session 3', date: '2025-01-18', completed: true },
     ],
-    teacher: 'patrick.w',
+    teacher: 'teacher1',
   },
   {
     email: 'ben.w',
-    password: '1234',
+    password: 'Secret123',
     role: 'admin',
   },
   {
     email: 'patrick.w',
-    password: '1234',
+    password: 'Secret123',
     role: 'teacher',
     // list of students assigned to this teacher
     students: ['nathan.w'],
+  },
+  {
+    email: 'teacher1',
+    password: 'Secret123',
+    role: 'teacher',
+    // list of students assigned to this teacher
+    students: ['student1'],
+  },
+  {
+    email: 'student1',
+    password: 'Secret123',
+    role: 'student',
+    modulesPurchased: [4],
+    sessionsTotal: 12,
+    sessionsCompleted: 3,
+    sessions: [
+      { title: 'Session 1', date: '2025-01-12', completed: true },
+      { title: 'Session 2', date: '2025-01-15', completed: true },
+      { title: 'Session 3', date: '2025-01-18', completed: true },
+    ],
+    teacher: 'teacher1',
   },
 ];
 
@@ -700,16 +721,6 @@ const adminUploadPdfBtnEl = document.getElementById('admin-upload-pdf-btn');
 // Chapter description element
 const chapterDescEl = document.getElementById('chapter-description');
 
-// Video upload input and progress elements
-const videoFileInput = document.getElementById('video-file-input');
-const videoUploadProgress = document.getElementById('video-upload-progress');
-const videoUploadBar = document.getElementById('video-upload-bar');
-const videoUploadText = document.getElementById('video-upload-text');
-
-// Store which module/chapter is being uploaded
-let currentUploadModuleId = null;
-let currentUploadChapterId = null;
-
 // User info and logout controls in header
 const userInfoEl = document.getElementById('user-info');
 const userLabelEl = document.getElementById('user-label');
@@ -746,9 +757,7 @@ function translate() {
   document.getElementById('home-title').textContent = t.homeTitle;
   document.getElementById('home-subtitle').textContent = t.homeSubtitle;
   document.getElementById('home-description').textContent = t.homeDescription;
-  // Update hero login button text only if the element exists (the button is hidden)
-  const homeLoginEl = document.getElementById('home-login-btn');
-  if (homeLoginEl) homeLoginEl.textContent = t.loginBtn;
+  document.getElementById('home-login-btn').textContent = t.loginBtn;
   // info cards
   document.getElementById('card-courses-title').textContent = t.cardCoursesTitle;
   document.getElementById('card-courses-desc').textContent = t.cardCoursesDesc;
@@ -899,7 +908,7 @@ function updateAfterLogin() {
     }
     // hide apply button and home login if logged in
     applyBtn.style.display = 'none';
-    if (homeLoginBtn) homeLoginBtn.style.display = 'none';
+    homeLoginBtn.style.display = 'none';
     sidebar.classList.remove('hidden');
     // update nav for roles
     if (state.currentUser.role === 'admin') {
@@ -943,7 +952,7 @@ function updateAfterLogin() {
     // hide user info section
     if (userInfoEl) userInfoEl.classList.add('hidden');
     applyBtn.style.display = '';
-    if (homeLoginBtn) homeLoginBtn.style.display = '';
+    homeLoginBtn.style.display = '';
     sidebar.classList.add('hidden');
     showView('home');
     buildUserList();
@@ -1043,30 +1052,22 @@ function loadChapter(module, chapter) {
     }
   }
 
-  // Show or hide upload section depending on role: both admin and teacher can upload
+  // Show or hide admin upload section depending on role
   if (adminUploadSectionEl) {
-    if (state.currentUser && (state.currentUser.role === 'admin' || state.currentUser.role === 'teacher')) {
+    if (state.currentUser && state.currentUser.role === 'admin') {
       adminUploadSectionEl.classList.remove('hidden');
-      // handler for video upload using Vimeo tus
+      // set up handlers for video and PDF upload
       if (adminUploadVideoBtnEl) {
         adminUploadVideoBtnEl.onclick = () => {
-          // store the module and chapter ids for later update
-          currentUploadModuleId = module.id;
-          currentUploadChapterId = chapter.id;
-          // reset progress
-          if (videoUploadProgress) {
-            videoUploadBar.style.width = '0%';
-            videoUploadText.textContent = '0%';
-            videoUploadProgress.classList.add('hidden');
-          }
-          // trigger file selection
-          if (videoFileInput) {
-            videoFileInput.value = '';
-            videoFileInput.click();
+          const tLang = translations[state.currentLang];
+          const url = prompt(tLang.enterVideoUrlPrompt);
+          if (url) {
+            chapter.video = url;
+            videoEl.src = url;
+            alert(tLang.videoUpdated);
           }
         };
       }
-      // handler for PDF upload remains unchanged (teachers/admins)
       if (adminUploadPdfBtnEl) {
         adminUploadPdfBtnEl.onclick = () => {
           const tLang = translations[state.currentLang];
@@ -1781,75 +1782,7 @@ function setupAgendaControls() {
 
 // Event handlers
 applyBtn.addEventListener('click', () => showModal(authModal));
-// The hero login button is hidden; add event listener only if it exists
-if (homeLoginBtn) {
-  homeLoginBtn.addEventListener('click', () => showModal(authModal));
-}
-
-// Handle video file selection and upload to Vimeo via secure link
-if (videoFileInput) {
-  videoFileInput.addEventListener('change', async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-    try {
-      // Request a secure upload link from our backend
-      const res = await fetch('/api/create-vimeo-upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoSize: file.size })
-      });
-      if (!res.ok) {
-        throw new Error('Failed to get Vimeo upload link');
-      }
-      const data = await res.json();
-      const uploadLink = data.upload_link;
-      const videoUri = data.video_uri;
-      // Show progress bar
-      if (videoUploadProgress) videoUploadProgress.classList.remove('hidden');
-      // Use tus-js-client for resumable upload
-      const upload = new tus.Upload(file, {
-        endpoint: uploadLink,
-        uploadUrl: uploadLink,
-        retryDelays: [0, 3000, 5000, 10000, 20000],
-        metadata: { filename: file.name, filetype: file.type },
-        onError: function (error) {
-          console.error('Upload failed:', error);
-          alert('Erreur lors du téléchargement de la vidéo');
-        },
-        onProgress: function (bytesUploaded, bytesTotal) {
-          const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
-          if (videoUploadBar) videoUploadBar.style.width = percentage + '%';
-          if (videoUploadText) videoUploadText.textContent = percentage + '%';
-        },
-        onSuccess: function () {
-          // Update local modules data
-          const moduleIndex = modules.findIndex(m => m.id === currentUploadModuleId);
-          if (moduleIndex !== -1) {
-            const chapterIndex = modules[moduleIndex].chapters.findIndex(ch => ch.id === currentUploadChapterId);
-            if (chapterIndex !== -1) {
-              modules[moduleIndex].chapters[chapterIndex].video = videoUri;
-            }
-          }
-          // Update video player if user is on the course view
-          const videoEl = document.getElementById('course-video');
-          if (videoEl) {
-            videoEl.src = videoUri;
-            videoEl.load();
-          }
-          if (videoUploadBar) videoUploadBar.style.width = '100%';
-          if (videoUploadText) videoUploadText.textContent = '100%';
-          alert(translations[state.currentLang].videoUpdated || 'Vidéo mise à jour.');
-          // Hide progress bar after completion
-          if (videoUploadProgress) setTimeout(() => videoUploadProgress.classList.add('hidden'), 1500);
-        }
-      });
-      upload.start();
-    } catch (error) {
-      console.error(error);
-      alert('Erreur lors de la préparation du téléchargement');
-    }
-  });
-}
+homeLoginBtn.addEventListener('click', () => showModal(authModal));
 authClose.addEventListener('click', () => hideModal(authModal));
 loginForm.addEventListener('submit', e => {
   e.preventDefault();
