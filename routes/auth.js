@@ -19,40 +19,7 @@ const logger = winston.createLogger({
   ]
 });
 
-// In-memory user storage (replace with database in production)
-// Passwords are hashed with bcrypt
-let users = [
-  {
-    id: 1,
-    username: 'admin',
-    email: 'admin@melies.com',
-    password: '$2a$12$BDmszBInHeXyu9f1WbOSwe01N5dM0vv.y5SpYpGRcifgs/54HKspi', // Secret123
-    role: 'admin',
-    createdAt: new Date().toISOString(),
-    lastLogin: null,
-    isActive: true
-  },
-  {
-    id: 2,
-    username: 'teacher1',
-    email: 'teacher@melies.com',
-    password: '$2a$12$BDmszBInHeXyu9f1WbOSwe01N5dM0vv.y5SpYpGRcifgs/54HKspi', // Secret123
-    role: 'teacher',
-    createdAt: new Date().toISOString(),
-    lastLogin: null,
-    isActive: true
-  },
-  {
-    id: 3,
-    username: 'student1',
-    email: 'student@melies.com',
-    password: '$2a$12$BDmszBInHeXyu9f1WbOSwe01N5dM0vv.y5SpYpGRcifgs/54HKspi', // Secret123
-    role: 'student',
-    createdAt: new Date().toISOString(),
-    lastLogin: null,
-    isActive: true
-  }
-];
+const { getUsersData } = require('../data/users');
 
 // Blacklisted tokens (in production, use Redis)
 let tokenBlacklist = new Set();
@@ -63,7 +30,7 @@ router.post('/login', validateLogin, async (req, res) => {
     const { username, password } = req.body;
     
     // Find user by username or email
-    const user = users.find(u => 
+    const user = getUsersData().find(u =>
       (u.username === username || u.email === username) && u.isActive
     );
 
@@ -153,7 +120,7 @@ router.post('/refresh', async (req, res) => {
     const decoded = verifyRefreshToken(refreshToken);
     
     // Find user
-    const user = users.find(u => u.id === decoded.id && u.isActive);
+    const user = getUsersData().find(u => u.id === decoded.id && u.isActive);
     if (!user) {
       return res.status(401).json({ 
         error: 'User not found or inactive',
@@ -237,7 +204,7 @@ router.post('/logout', authenticateToken, (req, res) => {
 // Get current user profile
 router.get('/profile', authenticateToken, (req, res) => {
   try {
-    const user = users.find(u => u.id === req.user.id && u.isActive);
+    const user = getUsersData().find(u => u.id === req.user.id && u.isActive);
     
     if (!user) {
       return res.status(404).json({ 
@@ -284,7 +251,7 @@ router.post('/change-password', authenticateToken, async (req, res) => {
       });
     }
 
-    const user = users.find(u => u.id === req.user.id && u.isActive);
+    const user = getUsersData().find(u => u.id === req.user.id && u.isActive);
     if (!user) {
       return res.status(404).json({ 
         error: 'User not found',
@@ -332,10 +299,6 @@ router.post('/change-password', authenticateToken, async (req, res) => {
     });
   }
 });
-
-// Export users for other routes (temporary, replace with database)
-router.getUsersData = () => users;
-router.setUsersData = (newUsers) => { users = newUsers; };
 
 module.exports = router;
 
