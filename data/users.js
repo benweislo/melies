@@ -37,7 +37,7 @@ let users = [
     email: 'teacher1',
     password: '$2a$12$BDmszBInHeXyu9f1WbOSwe01N5dM0vv.y5SpYpGRcifgs/54HKspi', // Secret123
     role: 'teacher',
-    createdAt: new '2024-01-01T00:00:00.000Z',
+    createdAt: new Date().toISOString(),
     lastLogin: null,
     isActive: true
   },
