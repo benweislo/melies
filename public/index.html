@@ -128,17 +128,60 @@
 
     <!-- Mentoring View (authenticated) -->
     <section id="mentoring-view" class="hidden">
-      <h2 id="mentoring-title">Progression Mentorat</h2>
-      <div class="progress-bar-wrapper">
-        <div id="progress-bar" class="progress-bar">
-          <div id="progress-bar-fill" class="progress-bar-fill"></div>
+      <h2 id="mentoring-title">Mentorat</h2>
+
+      <!-- Filter Controls -->
+      <div id="mentoring-controls" class="mentoring-controls">
+        <div class="filter-group">
+          <label for="filter-start-date">De:</label>
+          <input type="date" id="filter-start-date">
+          <label for="filter-end-date">À:</label>
+          <input type="date" id="filter-end-date">
         </div>
-        <p id="progress-text"></p>
+        <div id="admin-filters" class="filter-group hidden">
+          <label for="filter-mentor">Mentor:</label>
+          <select id="filter-mentor"><option value="">Tous</option></select>
+          <label for="filter-student">Étudiant:</label>
+          <select id="filter-student"><option value="">Tous</option></select>
+        </div>
+        <div class="filter-group">
+          <input type="search" id="filter-search" placeholder="Rechercher par titre...">
+        </div>
+        <button id="add-session-btn" class="primary-btn hidden">Ajouter une session</button>
       </div>
-      <ul id="sessions-list" class="sessions-list"></ul>
-      <!-- Containers for teacher and admin mentoring views -->
-      <div id="teacher-mentor-container" class="hidden"></div>
-      <div id="admin-mentor-container" class="hidden"></div>
+
+      <!-- Sessions Display Area -->
+      <div id="sessions-container" class="sessions-container">
+        <div id="sessions-loading" class="loading-state">Chargement des sessions...</div>
+        <table id="sessions-table" class="sessions-table hidden">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Heure</th>
+              <th>Étudiant</th>
+              <th>Mentor</th>
+              <th>Titre</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="sessions-table-body">
+            <!-- Session rows will be injected here by JavaScript -->
+          </tbody>
+        </table>
+        <div id="sessions-empty" class="empty-state hidden">
+          <p>Aucune session trouvée pour les filtres sélectionnés.</p>
+        </div>
+      </div>
+
+      <!-- Student-specific progress bar (will be shown/hidden by JS) -->
+      <div id="student-progress-container" class="hidden">
+          <h3>Ma Progression</h3>
+          <div class="progress-bar-wrapper">
+            <div id="progress-bar" class="progress-bar"></div>
+            <p id="progress-text"></p>
+          </div>
+      </div>
     </section>
 
     <!-- Agenda View (authenticated) -->

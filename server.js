@@ -100,6 +100,7 @@ const userRoutes = require('./routes/users');
 const moduleRoutes = require('./routes/modules');
 const eventRoutes = require('./routes/events');
 const uploadRoutes = require('./routes/upload');
+const sessionRoutes = require('./routes/sessions');
 
 // API routes
 app.use('/api/auth', authRoutes);
@@ -107,6 +108,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/modules', moduleRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/sessions', sessionRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

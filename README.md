@@ -312,6 +312,32 @@ Content-Type: application/json
 }
 ```
 
+### Sessions de Mentorat
+```http
+GET /api/sessions?start=2025-09-01&end=2025-09-30&mentorId=3
+Authorization: Bearer <token>
+
+Response:
+{
+  "sessions": [
+    {
+      "id": 1,
+      "mentorId": 3,
+      "studentId": 2,
+      "title": "Animation Principles Review",
+      "description": "Reviewing the 12 principles of animation.",
+      "date": "2025-09-18",
+      "startTime": "10:00",
+      "endTime": "11:00",
+      "status": "planned",
+      "notes": "Student should prepare questions about squash and stretch.",
+      "createdAt": "...",
+      "updatedAt": "..."
+    }
+  ]
+}
+```
+
 ## 🛠️ Développement et Contribution
 
 ### Structure du Code
