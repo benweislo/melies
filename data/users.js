@@ -45,7 +45,8 @@ let users = [
     role: 'teacher',
     createdAt: new Date().toISOString(),
     lastLogin: null,
-    isActive: true
+    isActive: true,
+    students: ['nathan.w', 'student1']
   },
   {
     id: 4,
