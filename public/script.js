@@ -682,11 +682,23 @@ const pdfSection = document.getElementById('pdf-section');
 const pdfDescEl = document.getElementById('pdf-desc');
 const downloadPdfBtn = document.getElementById('download-pdf-btn');
 const curriculumEl = document.getElementById('curriculum');
-const progressBarFill = document.getElementById('progress-bar-fill');
+// Mentoring page elements
+const mentoringControls = document.getElementById('mentoring-controls');
+const adminFilters = document.getElementById('admin-filters');
+const filterStartDate = document.getElementById('filter-start-date');
+const filterEndDate = document.getElementById('filter-end-date');
+const filterMentor = document.getElementById('filter-mentor');
+const filterStudent = document.getElementById('filter-student');
+const filterSearch = document.getElementById('filter-search');
+const addSessionBtn = document.getElementById('add-session-btn');
+const sessionsContainer = document.getElementById('sessions-container');
+const sessionsLoading = document.getElementById('sessions-loading');
+const sessionsTable = document.getElementById('sessions-table');
+const sessionsTableBody = document.getElementById('sessions-table-body');
+const sessionsEmpty = document.getElementById('sessions-empty');
+const studentProgressContainer = document.getElementById('student-progress-container');
+const progressBar = document.getElementById('progress-bar');
 const progressText = document.getElementById('progress-text');
-const sessionsList = document.getElementById('sessions-list');
-const teacherMentorContainer = document.getElementById('teacher-mentor-container');
-const adminMentorContainer = document.getElementById('admin-mentor-container');
 const adminTitle = document.getElementById('admin-title');
 const addModuleBtn = document.getElementById('add-module-btn');
 const moduleListEl = document.getElementById('module-list');
@@ -923,7 +935,7 @@ function showView(name) {
     case 'mentoring':
       mentoringView.classList.remove('hidden');
       if(navMentoringBtn) navMentoringBtn.classList.add('active');
-      updateMentoring(); // Call the build function
+      buildMentoringPage(); // Call the new main function for the mentoring page
       break;
     case 'admin':
       adminView.classList.remove('hidden');
@@ -1153,124 +1165,280 @@ function loadChapter(module, chapter) {
   }
 }
 
-function updateMentoring() {
-  if (!state.currentUser) return;
-  switch (state.currentUser.role) {
-    case 'student':
-      updateStudentMentoring();
-      break;
-    case 'teacher':
-      updateTeacherMentoring();
-      break;
-    case 'admin':
-      updateAdminMentoring();
-      break;
-  }
-}
+// --- Mentoring Page Logic ---
 
-function updateStudentMentoring() {
-  if (!state.currentUser || state.currentUser.role !== 'student') {
-    document.querySelector('.progress-bar-wrapper').style.display = 'none';
-    sessionsList.style.display = 'none';
-    return;
-  }
+// In-memory cache for users to avoid re-fetching for filters
+let userCache = { teachers: [], students: [], all: [] };
 
-  const completed = state.currentUser.sessionsCompleted || 0;
-  const total = state.currentUser.sessionsTotal || 0;
+async function buildMentoringPage() {
+    if (!state.currentUser) return;
 
-  document.querySelector('.progress-bar-wrapper').style.display = '';
-  sessionsList.style.display = '';
-  if (teacherMentorContainer) teacherMentorContainer.classList.add('hidden');
-  if (adminMentorContainer) adminMentorContainer.classList.add('hidden');
+    // Show/hide UI elements based on role
+    setupMentoringUI(state.currentUser.role);
 
-  const percent = total > 0 ? (completed / total) * 100 : 0;
-  const progressBar = document.getElementById('progress-bar');
+    // Add event listeners to filters (idempotent)
+    setupFilterEventListeners();
 
-  if (progressBar) {
-    // Use a CSS gradient for the two-tone progress bar effect.
-    progressBar.style.background = `linear-gradient(to right, #4CAF50 ${percent}%, #E0E0E0 ${percent}%)`;
-  }
-  if (progressBarFill) {
-    // The inner fill element is no longer needed with the gradient approach.
-    progressBarFill.style.display = 'none';
-  }
-
-  // Display the progress as a fraction, e.g., "3/12".
-  progressText.textContent = `${completed}/${total}`;
-
-  sessionsList.innerHTML = '';
-  const userSessions = state.currentUser.sessions || [];
-  for (let idx = 0; idx < total; idx++) {
-    const session = userSessions[idx];
-    const li = document.createElement('li');
-    if (session && session.completed) {
-      li.classList.add('completed');
+    // Populate admin filters if needed
+    if (state.currentUser.role === 'admin') {
+        await populateAdminFilters();
     }
-    const icon = document.createElement('span');
-    icon.className = 'session-icon';
-    icon.textContent = (session && session.completed) ? '✔️' : '○';
-    const text = document.createElement('span');
-    text.textContent = session ? `${session.title} - ${session.date}` : `Session ${idx + 1}`;
-    li.appendChild(icon);
-    li.appendChild(text);
-    sessionsList.appendChild(li);
-  }
+
+    // Fetch and render sessions
+    await fetchAndRenderSessions();
+
+    // Show student progress bar if applicable
+    if (state.currentUser.role === 'student') {
+        renderStudentProgress();
+    }
 }
 
-async function updateTeacherMentoring() {
-  if (!state.currentUser || state.currentUser.role !== 'teacher' || !teacherMentorContainer) {
-    if(teacherMentorContainer) teacherMentorContainer.style.display = 'none';
-    return;
-  }
+function setupMentoringUI(role) {
+    if (role === 'admin') {
+        adminFilters.classList.remove('hidden');
+        addSessionBtn.classList.remove('hidden');
+        studentProgressContainer.classList.add('hidden');
+    } else if (role === 'teacher') {
+        adminFilters.classList.add('hidden');
+        addSessionBtn.classList.remove('hidden');
+        studentProgressContainer.classList.add('hidden');
+    } else { // student
+        adminFilters.classList.add('hidden');
+        addSessionBtn.classList.add('hidden');
+        studentProgressContainer.classList.remove('hidden');
+    }
+}
 
-  teacherMentorContainer.style.display = 'block';
-  teacherMentorContainer.innerHTML = '<h3>My Students</h3>';
+function setupFilterEventListeners() {
+    // Use a flag to ensure listeners are only added once
+    if (mentoringControls.dataset.listenersAttached) return;
 
-  const token = localStorage.getItem('token');
-  const t = translations[state.currentLang];
-
-  try {
-    const response = await fetch('/api/users', {
-      headers: { 'Authorization': `Bearer ${token}` }
+    const filters = [filterStartDate, filterEndDate, filterMentor, filterStudent, filterSearch];
+    filters.forEach(filter => {
+        if(filter) filter.addEventListener('change', fetchAndRenderSessions);
     });
-    if (!response.ok) throw new Error('Failed to fetch user data');
+    mentoringControls.dataset.listenersAttached = 'true';
+}
 
-    const allUsers = (await response.json()).users;
-    const studentUsernames = state.currentUser.students || [];
+async function populateAdminFilters() {
+    // Use cache if available
+    if (userCache.all.length > 0) return;
 
-    if (studentUsernames.length === 0) {
-      teacherMentorContainer.innerHTML += `<p>${t.noStudents}</p>`;
-      return;
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch('/api/users', { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!response.ok) throw new Error('Failed to fetch users for filters');
+
+        const { users } = await response.json();
+        userCache.all = users;
+        userCache.teachers = users.filter(u => u.role === 'teacher');
+        userCache.students = users.filter(u => u.role === 'student');
+
+        // Populate mentor dropdown
+        filterMentor.innerHTML = '<option value="">Tous les mentors</option>';
+        userCache.teachers.forEach(t => {
+            filterMentor.innerHTML += `<option value="${t.id}">${t.username}</option>`;
+        });
+
+        // Populate student dropdown
+        filterStudent.innerHTML = '<option value="">Tous les étudiants</option>';
+        userCache.students.forEach(s => {
+            filterStudent.innerHTML += `<option value="${s.id}">${s.username}</option>`;
+        });
+
+    } catch (error) {
+        console.error("Error populating admin filters:", error);
+    }
+}
+
+async function fetchAndRenderSessions() {
+    sessionsTable.classList.add('hidden');
+    sessionsEmpty.classList.add('hidden');
+    sessionsLoading.classList.remove('hidden');
+
+    const token = localStorage.getItem('token');
+    const params = new URLSearchParams({
+        start: filterStartDate.value,
+        end: filterEndDate.value,
+        mentorId: filterMentor.value,
+        studentId: filterStudent.value,
+        q: filterSearch.value
+    });
+
+    try {
+        const response = await fetch(`/api/sessions?${params.toString()}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Failed to fetch sessions');
+
+        const { sessions } = await response.json();
+        renderSessionsTable(sessions);
+    } catch (error) {
+        console.error("Error fetching sessions:", error);
+        sessionsContainer.innerHTML = `<p>Error loading sessions.</p>`;
+    } finally {
+        sessionsLoading.classList.add('hidden');
+    }
+}
+
+function renderSessionsTable(sessions) {
+    sessionsTableBody.innerHTML = '';
+    if (sessions.length === 0) {
+        sessionsEmpty.classList.remove('hidden');
+        sessionsTable.classList.add('hidden');
+        return;
     }
 
-    studentUsernames.forEach(username => {
-      const student = allUsers.find(u => u.username === username);
-      if (student) {
-        const completed = student.sessionsCompleted || 0;
-        const total = student.sessionsTotal || 0;
-        const percent = total > 0 ? (completed / total) * 100 : 0;
+    const users = userCache.all;
+    const findName = (id) => users.find(u => u.id === id)?.username || 'Unknown';
+    const t = translations[state.currentLang];
 
-        const studentEl = document.createElement('div');
-        studentEl.className = 'student-progress-item';
-        studentEl.innerHTML = `
-          <h4>${student.username}</h4>
-          <div class="progress-bar-wrapper">
-            <div class="progress-bar" style="background: linear-gradient(to right, #4CAF50 ${percent}%, #E0E0E0 ${percent}%);"></div>
-            <p class="progress-text">${completed}/${total}</p>
-          </div>
+    sessions.forEach(session => {
+        const row = document.createElement('tr');
+        row.dataset.sessionId = session.id;
+
+        row.innerHTML = `
+            <td>${session.date}</td>
+            <td>${session.startTime} - ${session.endTime}</td>
+            <td>${findName(session.studentId)}</td>
+            <td>${findName(session.mentorId)}</td>
+            <td>${session.title}</td>
+            <td><span class="status-${session.status}">${session.status}</span></td>
+            <td class="actions"></td>
         `;
-        teacherMentorContainer.appendChild(studentEl);
-      }
+
+        const actionsCell = row.querySelector('.actions');
+        const canMutate = (state.currentUser.role === 'admin' || (state.currentUser.role === 'teacher' && state.currentUser.id === session.mentorId));
+
+        if (canMutate) {
+            const editBtn = document.createElement('button');
+            editBtn.textContent = t.edit;
+            editBtn.className = 'edit-session-btn';
+            editBtn.onclick = () => handleEditSession(session);
+            actionsCell.appendChild(editBtn);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = t.delete;
+            deleteBtn.className = 'delete-session-btn';
+            deleteBtn.onclick = () => handleDeleteSession(session.id);
+            actionsCell.appendChild(deleteBtn);
+        }
+
+        sessionsTableBody.appendChild(row);
     });
 
-  } catch (error) {
-    console.error('Error building teacher mentoring view:', error);
-    teacherMentorContainer.innerHTML = `<p>Error loading student data.</p>`;
-  }
+    sessionsTable.classList.remove('hidden');
+    sessionsEmpty.classList.add('hidden');
 }
 
-function updateAdminMentoring() {
-    // Implementation for admin view
+// --- CRUD Handlers for Sessions ---
+
+async function handleAddSession() {
+    const t = translations[state.currentLang];
+    // In a real app, this would be a modal form. Prompts are used for simplicity.
+    const title = prompt("Session Title:");
+    if (!title) return;
+    const date = prompt("Date (YYYY-MM-DD):");
+    const startTime = prompt("Start Time (HH:mm):");
+    const endTime = prompt("End Time (HH:mm):");
+
+    let mentorId = state.currentUser.id;
+    let studentId;
+
+    if (state.currentUser.role === 'admin') {
+        mentorId = prompt(`Mentor ID (Choose from: ${userCache.teachers.map(t => `${t.id}=${t.username}`).join(', ')}):`);
+        studentId = prompt(`Student ID (Choose from: ${userCache.students.map(s => `${s.id}=${s.username}`).join(', ')}):`);
+    } else { // Teacher
+        studentId = prompt(`Student ID (Choose from your students):`);
+    }
+
+    if (!date || !startTime || !endTime || !mentorId || !studentId) {
+        alert("All fields are required.");
+        return;
+    }
+
+    const newSessionData = {
+        title, date, startTime, endTime, mentorId: parseInt(mentorId), studentId: parseInt(studentId),
+        status: 'planned', description: '', notes: ''
+    };
+
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch('/api/sessions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(newSessionData)
+        });
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.errors ? err.errors[0].msg : 'Failed to create session');
+        }
+        await fetchAndRenderSessions(); // Refresh the list
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+    }
+}
+
+async function handleEditSession(session) {
+    const t = translations[state.currentLang];
+    const newTitle = prompt("Enter new title:", session.title);
+    if (newTitle === null) return; // User cancelled
+
+    const newStatus = prompt("Enter new status (planned, done, canceled):", session.status);
+    if (newStatus === null) return;
+
+    const updatedData = { ...session, title: newTitle, status: newStatus };
+
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`/api/sessions/${session.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(updatedData)
+        });
+        if (!response.ok) throw new Error('Failed to update session');
+        await fetchAndRenderSessions();
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+    }
+}
+
+async function handleDeleteSession(sessionId) {
+    const t = translations[state.currentLang];
+    if (!confirm(t.confirmDelete || "Are you sure you want to delete this session?")) return;
+
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`/api/sessions/${sessionId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Failed to delete session');
+        await fetchAndRenderSessions();
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+    }
+}
+
+// Attach listener to the main "Add Session" button
+if (addSessionBtn && !addSessionBtn.dataset.listenerAttached) {
+    addSessionBtn.addEventListener('click', handleAddSession);
+    addSessionBtn.dataset.listenerAttached = 'true';
+}
+
+function renderStudentProgress() {
+    if (!state.currentUser || state.currentUser.role !== 'student') return;
+
+    const completed = state.currentUser.sessionsCompleted || 0;
+    const total = state.currentUser.sessionsTotal || 0;
+    const percent = total > 0 ? (completed / total) * 100 : 0;
+
+    if (progressBar) {
+        progressBar.style.background = `linear-gradient(to right, #4CAF50 ${percent}%, #E0E0E0 ${percent}%)`;
+    }
+    if (progressText) {
+        progressText.textContent = `${completed}/${total}`;
+    }
 }
 
 function buildAdminList() {
