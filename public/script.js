@@ -1049,15 +1049,27 @@ function loadChapter(module, chapter) {
 
   if (chapter.video) {
     if (chapter.video.includes('vimeo')) {
-      // It's a Vimeo video, use an iframe
-      const iframe = document.createElement('iframe');
-      iframe.src = chapter.video;
-      iframe.width = '100%';
-      iframe.height = '100%';
-      iframe.frameborder = '0';
-      iframe.allow = 'autoplay; fullscreen; picture-in-picture';
-      iframe.allowfullscreen = true;
-      videoContainer.appendChild(iframe);
+      // It's a Vimeo video, use the more robust user-provided embed code structure.
+      const videoId = chapter.video.split('/').pop().split('?')[0]; // Get ID from URL
+      const embedCode = `
+        <div style="padding:56.25% 0 0 0;position:relative;">
+          <iframe
+            src="https://player.vimeo.com/video/${videoId}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+            frameborder="0"
+            allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+            style="position:absolute;top:0;left:0;width:100%;height:100%;"
+            title="Masterclass : How To Be Imperfect in animation">
+          </iframe>
+        </div>
+      `;
+      videoContainer.innerHTML = embedCode;
+
+      // Ensure the Vimeo player API script is loaded
+      if (!document.querySelector('script[src="https://player.vimeo.com/api/player.js"]')) {
+        const vimeoScript = document.createElement('script');
+        vimeoScript.src = 'https://player.vimeo.com/api/player.js';
+        document.body.appendChild(vimeoScript);
+      }
     } else {
       // It's a direct video link, use the video tag
       const videoEl = document.createElement('video');
@@ -1069,10 +1081,11 @@ function loadChapter(module, chapter) {
       videoEl.load();
     }
   } else {
-    // No video, maybe show a placeholder or the poster
+    // No video, show the chapter poster as a placeholder
     const posterImage = document.createElement('img');
     posterImage.src = chapter.poster || 'thumbnail.jpg';
     posterImage.style.width = '100%';
+    posterImage.alt = chapter.title;
     videoContainer.appendChild(posterImage);
   }
 
