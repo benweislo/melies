@@ -404,7 +404,7 @@ let modules = [
             <li>Masterclass : how to be imperfect</li>
           </ul>
         `,
-        video: '',
+        video: 'https://player.vimeo.com/video/935849934',
         pdfDesc: '',
         pdfUrl: '',
         poster: 'thumbnail.jpg',
@@ -1043,14 +1043,39 @@ function loadChapter(module, chapter) {
   const t = translations[state.currentLang];
   chapterTitleEl.textContent = chapter.title;
   moduleNameEl.textContent = `${t.modulePrefix} ${module.id}: ${module.name}`;
-  const videoEl = document.getElementById('course-video');
+
+  const videoContainer = document.querySelector('.video-container');
+  videoContainer.innerHTML = ''; // Clear previous video/iframe
+
   if (chapter.video) {
-    videoEl.src = chapter.video;
+    if (chapter.video.includes('vimeo')) {
+      // It's a Vimeo video, use an iframe
+      const iframe = document.createElement('iframe');
+      iframe.src = chapter.video;
+      iframe.width = '100%';
+      iframe.height = '100%';
+      iframe.frameborder = '0';
+      iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+      iframe.allowfullscreen = true;
+      videoContainer.appendChild(iframe);
+    } else {
+      // It's a direct video link, use the video tag
+      const videoEl = document.createElement('video');
+      videoEl.id = 'course-video';
+      videoEl.controls = true;
+      videoEl.src = chapter.video;
+      videoEl.poster = chapter.poster || 'thumbnail.jpg';
+      videoContainer.appendChild(videoEl);
+      videoEl.load();
+    }
   } else {
-    videoEl.removeAttribute('src');
+    // No video, maybe show a placeholder or the poster
+    const posterImage = document.createElement('img');
+    posterImage.src = chapter.poster || 'thumbnail.jpg';
+    posterImage.style.width = '100%';
+    videoContainer.appendChild(posterImage);
   }
-  videoEl.poster = chapter.poster || 'thumbnail.jpg';
-  videoEl.load();
+
   if (chapter.pdfDesc) {
     pdfSection.classList.remove('hidden');
     pdfDescEl.textContent = chapter.pdfDesc;
@@ -1179,8 +1204,56 @@ function updateStudentMentoring() {
   }
 }
 
-function updateTeacherMentoring() {
-    // Implementation for teacher view
+async function updateTeacherMentoring() {
+  if (!state.currentUser || state.currentUser.role !== 'teacher' || !teacherMentorContainer) {
+    if(teacherMentorContainer) teacherMentorContainer.style.display = 'none';
+    return;
+  }
+
+  teacherMentorContainer.style.display = 'block';
+  teacherMentorContainer.innerHTML = '<h3>My Students</h3>';
+
+  const token = localStorage.getItem('token');
+  const t = translations[state.currentLang];
+
+  try {
+    const response = await fetch('/api/users', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch user data');
+
+    const allUsers = (await response.json()).users;
+    const studentUsernames = state.currentUser.students || [];
+
+    if (studentUsernames.length === 0) {
+      teacherMentorContainer.innerHTML += `<p>${t.noStudents}</p>`;
+      return;
+    }
+
+    studentUsernames.forEach(username => {
+      const student = allUsers.find(u => u.username === username);
+      if (student) {
+        const completed = student.sessionsCompleted || 0;
+        const total = student.sessionsTotal || 0;
+        const percent = total > 0 ? (completed / total) * 100 : 0;
+
+        const studentEl = document.createElement('div');
+        studentEl.className = 'student-progress-item';
+        studentEl.innerHTML = `
+          <h4>${student.username}</h4>
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar" style="background: linear-gradient(to right, #4CAF50 ${percent}%, #E0E0E0 ${percent}%);"></div>
+            <p class="progress-text">${completed}/${total}</p>
+          </div>
+        `;
+        teacherMentorContainer.appendChild(studentEl);
+      }
+    });
+
+  } catch (error) {
+    console.error('Error building teacher mentoring view:', error);
+    teacherMentorContainer.innerHTML = `<p>Error loading student data.</p>`;
+  }
 }
 
 function updateAdminMentoring() {

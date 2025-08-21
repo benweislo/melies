@@ -16,7 +16,7 @@ const logger = winston.createLogger({
 const { getUsersData, setUsersData } = require('../data/users');
 
 // Get all users (admin only)
-router.get('/', authenticateToken, requireRole(['admin']), (req, res) => {
+router.get('/', authenticateToken, requireRole(['admin', 'teacher']), (req, res) => {
   try {
     const users = getUsersData();
     const safeUsers = users.map(user => {
