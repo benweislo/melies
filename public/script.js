@@ -690,6 +690,23 @@ const adminMentorContainer = document.getElementById('admin-mentor-container');
 const adminTitle = document.getElementById('admin-title');
 const addModuleBtn = document.getElementById('add-module-btn');
 const moduleListEl = document.getElementById('module-list');
+
+if (addModuleBtn) {
+  addModuleBtn.addEventListener('click', () => {
+    const t = translations[state.currentLang];
+    const moduleName = prompt(t.newModuleNamePrompt);
+    if (moduleName) {
+      const newModule = {
+        id: modules.length > 0 ? Math.max(...modules.map(m => m.id)) + 1 : 1,
+        name: moduleName,
+        chapters: [] // New modules start with no chapters
+      };
+      modules.push(newModule);
+      buildAdminList();
+      buildCurriculum();
+    }
+  });
+}
 const langFab = document.getElementById('lang-fab');
 const langSelector = document.getElementById('lang-selector');
 const langButtons = langSelector.querySelectorAll('button');
@@ -707,6 +724,44 @@ const mobileAdminLi = document.getElementById('mobile-admin-li');
 const userManagementTitleEl = document.getElementById('user-management-title');
 const addUserBtn = document.getElementById('add-user-btn');
 const userListEl = document.getElementById('user-list');
+
+if (addUserBtn) {
+  addUserBtn.addEventListener('click', async () => {
+    const t = translations[state.currentLang];
+    const email = prompt(t.userEmailPrompt);
+    const password = prompt(t.userPasswordPrompt);
+    const role = prompt(t.userRolePrompt);
+
+    if (email && password && role) {
+      if (!['student', 'teacher', 'admin'].includes(role)) {
+        alert('Invalid role specified.');
+        return;
+      }
+
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch('/api/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ email, username: email, password, role }) // Using email as username for simplicity
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to add user');
+        }
+
+        alert(t.userAdded);
+        buildUserList(); // Refresh the list
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+  });
+}
 
 // Admin upload section and buttons in course view
 const adminUploadSectionEl = document.getElementById('admin-upload-section');
@@ -873,10 +928,8 @@ function showView(name) {
   }
 }
 
-function login(email, password) {
-  const user = users.find(u => u.email === email && u.password === password);
-  return user || null;
-}
+// The login function is now handled by the API call in the form submit event listener.
+// The mock 'login' function is no longer needed.
 
 function updateAfterLogin() {
   if (state.currentUser) {
@@ -1098,11 +1151,150 @@ function updateAdminMentoring() {
 }
 
 function buildAdminList() {
-    // Implementation for building admin list
+  if (!moduleListEl || !state.currentUser || state.currentUser.role !== 'admin') {
+    if (moduleListEl) moduleListEl.innerHTML = '';
+    return;
+  }
+
+  const t = translations[state.currentLang];
+  moduleListEl.innerHTML = ''; // Clear previous list
+
+  modules.forEach(module => {
+    const moduleItem = document.createElement('div');
+    moduleItem.className = 'module-item-admin'; // Use a different class to avoid conflicts
+    moduleItem.innerHTML = `
+      <span>${t.modulePrefix} ${module.id}: ${module.name}</span>
+      <div class="module-actions">
+        <button class="rename-module-btn" data-id="${module.id}">${t.edit}</button>
+        <button class="delete-module-btn" data-id="${module.id}">${t.delete}</button>
+      </div>
+    `;
+    moduleListEl.appendChild(moduleItem);
+  });
+
+  // Add event listeners
+  moduleListEl.querySelectorAll('.rename-module-btn').forEach(button => {
+    button.addEventListener('click', handleRenameModule);
+  });
+  moduleListEl.querySelectorAll('.delete-module-btn').forEach(button => {
+    button.addEventListener('click', handleDeleteModule);
+  });
 }
 
-function buildUserList() {
-    // Implementation for building user list
+function handleRenameModule(event) {
+  const moduleId = parseInt(event.target.dataset.id, 10);
+  const t = translations[state.currentLang];
+  const module = modules.find(m => m.id === moduleId);
+  if (module) {
+    const newName = prompt(t.renameModulePrompt, module.name);
+    if (newName) {
+      module.name = newName;
+      buildAdminList(); // Refresh admin list
+      buildCurriculum(); // Refresh curriculum for all users
+    }
+  }
+}
+
+function handleDeleteModule(event) {
+  const moduleId = parseInt(event.target.dataset.id, 10);
+  const t = translations[state.currentLang];
+  if (confirm(t.deleteConfirm)) {
+    modules = modules.filter(m => m.id !== moduleId);
+    buildAdminList(); // Refresh admin list
+    buildCurriculum(); // Refresh curriculum for all users
+  }
+}
+
+async function buildUserList() {
+  if (!userListEl || !state.currentUser || state.currentUser.role !== 'admin') {
+    if (userListEl) userListEl.innerHTML = '';
+    return;
+  }
+
+  const t = translations[state.currentLang];
+  const token = localStorage.getItem('token');
+
+  try {
+    const response = await fetch('/api/users', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch users');
+
+    const { users } = await response.json();
+    userListEl.innerHTML = ''; // Clear previous list
+
+    users.forEach(user => {
+      const userItem = document.createElement('div');
+      userItem.className = 'user-item';
+      userItem.innerHTML = `
+        <span>${user.email} (${user.role})</span>
+        <div class="user-actions">
+          <button class="edit-user-btn" data-id="${user.id}">${t.edit}</button>
+          <button class="delete-user-btn" data-id="${user.id}">${t.delete}</button>
+        </div>
+      `;
+      userListEl.appendChild(userItem);
+    });
+
+    // Add event listeners after creating the buttons
+    userListEl.querySelectorAll('.edit-user-btn').forEach(button => {
+      button.addEventListener('click', handleEditUser);
+    });
+    userListEl.querySelectorAll('.delete-user-btn').forEach(button => {
+      button.addEventListener('click', handleDeleteUser);
+    });
+
+  } catch (error) {
+    console.error('Error building user list:', error);
+    userListEl.innerHTML = `<p>Error loading users.</p>`;
+  }
+}
+
+async function handleEditUser(event) {
+  const userId = event.target.dataset.id;
+  const t = translations[state.currentLang];
+  const newRole = prompt(t.userRolePrompt);
+
+  if (newRole && ['student', 'teacher', 'admin'].includes(newRole)) {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ role: newRole })
+      });
+      if (!response.ok) throw new Error('Failed to update user role');
+      buildUserList(); // Refresh the list
+    } catch (error) {
+      alert(error.message);
+    }
+  } else if (newRole) {
+    alert('Invalid role specified.');
+  }
+}
+
+async function handleDeleteUser(event) {
+  const userId = event.target.dataset.id;
+  const t = translations[state.currentLang];
+  if (confirm(t.confirmDeleteUser)) {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete user');
+      }
+      buildUserList(); // Refresh the list
+    } catch (error) {
+      alert(error.message);
+    }
+  }
 }
 
 function buildAgenda() {
@@ -1124,28 +1316,52 @@ function updateAgenda() {
 
 function initCalendar() {
   const calendarEl = document.getElementById('calendar');
-  if (!calendarEl) return;
+  if (!calendarEl || !state.currentUser) {
+    if (calendarInstance) {
+        calendarInstance.destroy();
+        calendarInstance = null;
+    }
+    return;
+  }
+
   if (calendarInstance) {
     calendarInstance.destroy();
-    calendarInstance = null;
   }
-  const editable = state.currentUser && (state.currentUser.role === 'admin' || state.currentUser.role === 'teacher');
-  const events = agendaEvents.map((evt, idx) => ({ id: String(idx), title: evt.title, start: evt.date, description: evt.description }));
+
+  const editable = state.currentUser.role === 'admin' || state.currentUser.role === 'teacher';
+
   calendarInstance = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
     headerToolbar: false,
     locale: state.currentLang,
     selectable: editable,
     editable: editable,
-    events: events,
-    height: '100%', 
+    events: function(fetchInfo, successCallback, failureCallback) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        successCallback([]);
+        return;
+      }
+
+      fetch(`/api/events?start=${fetchInfo.startStr}&end=${fetchInfo.endStr}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      .then(response => response.ok ? response.json() : Promise.reject('Failed to load events'))
+      .then(data => successCallback(data.events || []))
+      .catch(error => failureCallback(error));
+    },
+    height: '100%',
     eventClick: function(info) {
-      // ... (event click logic)
+      console.log('Event clicked:', info.event);
     },
     select: function(info) {
-      // ... (select logic)
+      console.log('Date range selected:', info.startStr, info.endStr);
+    },
+    datesSet: function() {
+      updateCalendarTitle();
     }
   });
+
   calendarInstance.render();
   updateCalendarTitle();
 }
@@ -1157,7 +1373,24 @@ function updateCalendarTitle() {
 }
 
 function setupAgendaControls() {
-  // ... (agenda controls setup)
+  if (!calendarInstance) return;
+
+  const addListener = (id, event, listener) => {
+    const el = document.getElementById(id);
+    if (el) {
+      const newEl = el.cloneNode(true);
+      el.parentNode.replaceChild(newEl, el);
+      newEl.addEventListener(event, listener);
+    }
+  };
+
+  addListener('agenda-today-btn', 'click', () => calendarInstance.today());
+  addListener('agenda-prev-btn', 'click', () => calendarInstance.prev());
+  addListener('agenda-next-btn', 'click', () => calendarInstance.next());
+  addListener('agenda-day-btn', 'click', () => calendarInstance.changeView('timeGridDay'));
+  addListener('agenda-week-btn', 'click', () => calendarInstance.changeView('timeGridWeek'));
+  addListener('agenda-month-btn', 'click', () => calendarInstance.changeView('dayGridMonth'));
+  addListener('agenda-list-btn', 'click', () => calendarInstance.changeView('listWeek'));
 }
 
 // Event handlers
@@ -1167,18 +1400,35 @@ if(logoEl) {
 applyBtn.addEventListener('click', () => showModal(authModal));
 homeLoginBtn.addEventListener('click', () => showModal(authModal));
 authClose.addEventListener('click', () => hideModal(authModal));
-loginForm.addEventListener('submit', e => {
+loginForm.addEventListener('submit', async e => {
   e.preventDefault();
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
-  const user = login(email, password);
-  if (user) {
-    state.currentUser = { ...user };
-    hideModal(authModal);
-    updateAfterLogin();
-    buildCurriculum();
-  } else {
-    alert(translations[state.currentLang].invalidCredentials);
+  try {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Login failed' }));
+      throw new Error(errorData.error || translations[state.currentLang].invalidCredentials);
+    }
+    const data = await response.json();
+    if (data.accessToken && data.user) {
+      localStorage.setItem('token', data.accessToken);
+      state.currentUser = data.user;
+      hideModal(authModal);
+      updateAfterLogin();
+      buildCurriculum();
+      if (state.activeView === 'agenda') {
+        updateAgenda();
+      }
+    } else {
+      throw new Error(translations[state.currentLang].invalidCredentials);
+    }
+  } catch (error) {
+    alert(error.message);
   }
 });
 
@@ -1301,14 +1551,17 @@ Ta réponse:`;
 if (logoutBtn) {
   logoutBtn.addEventListener('click', () => {
     state.currentUser = null;
+    localStorage.removeItem('token');
     updateAfterLogin();
     translate();
+    showView('home');
   });
 }
 
 if (changeAccountBtn) {
   changeAccountBtn.addEventListener('click', () => {
     state.currentUser = null;
+    localStorage.removeItem('token');
     updateAfterLogin();
     translate();
     showModal(authModal);
