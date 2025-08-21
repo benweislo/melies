@@ -1408,7 +1408,7 @@ loginForm.addEventListener('submit', async e => {
     const response = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ username: email, password }),
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: 'Login failed' }));
