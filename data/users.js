@@ -3,8 +3,8 @@
 let users = [
   {
     id: 1,
-    username: 'admin',
-    email: 'admin@melies.com',
+    username: 'ben.w',
+    email: 'ben.w',
     password: '$2a$12$BDmszBInHeXyu9f1WbOSwe01N5dM0vv.y5SpYpGRcifgs/54HKspi', // Secret123
     role: 'admin',
     createdAt: new Date().toISOString(),
@@ -13,8 +13,18 @@ let users = [
   },
   {
     id: 2,
-    username: 'teacher1',
-    email: 'teacher@melies.com',
+    username: 'nathan.w',
+    email: 'nathan.w',
+    password: '$2a$12$BDmszBInHeXyu9f1WbOSwe01N5dM0vv.y5SpYpGRcifgs/54HKspi', // Secret123
+    role: 'student',
+    createdAt: new Date().toISOString(),
+    lastLogin: null,
+    isActive: true
+  },
+  {
+    id: 3,
+    username: 'patrick.w',
+    email: 'patrick.w',
     password: '$2a$12$BDmszBInHeXyu9f1WbOSwe01N5dM0vv.y5SpYpGRcifgs/54HKspi', // Secret123
     role: 'teacher',
     createdAt: new Date().toISOString(),
@@ -22,9 +32,19 @@ let users = [
     isActive: true
   },
   {
-    id: 3,
+    id: 4,
+    username: 'teacher1',
+    email: 'teacher1',
+    password: '$2a$12$BDmszBInHeXyu9f1WbOSwe01N5dM0vv.y5SpYpGRcifgs/54HKspi', // Secret123
+    role: 'teacher',
+    createdAt: new '2024-01-01T00:00:00.000Z',
+    lastLogin: null,
+    isActive: true
+  },
+  {
+    id: 5,
     username: 'student1',
-    email: 'student@melies.com',
+    email: 'student1',
     password: '$2a$12$BDmszBInHeXyu9f1WbOSwe01N5dM0vv.y5SpYpGRcifgs/54HKspi', // Secret123
     role: 'student',
     createdAt: new Date().toISOString(),
