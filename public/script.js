@@ -1131,22 +1131,43 @@ function updateMentoring() {
 }
 
 function updateStudentMentoring() {
-  const t = translations[state.currentLang];
+  if (!state.currentUser || state.currentUser.role !== 'student') {
+    document.querySelector('.progress-bar-wrapper').style.display = 'none';
+    sessionsList.style.display = 'none';
+    return;
+  }
+
   const completed = state.currentUser.sessionsCompleted || 0;
-  const total = state.currentUser.sessionsTotal || 12;
+  const total = state.currentUser.sessionsTotal || 0;
+
   document.querySelector('.progress-bar-wrapper').style.display = '';
   sessionsList.style.display = '';
   if (teacherMentorContainer) teacherMentorContainer.classList.add('hidden');
   if (adminMentorContainer) adminMentorContainer.classList.add('hidden');
+
   const percent = total > 0 ? (completed / total) * 100 : 0;
-  progressBarFill.style.width = `${percent}%`;
-  progressText.textContent = t.studentSessions(completed, total);
+  const progressBar = document.getElementById('progress-bar');
+
+  if (progressBar) {
+    // Use a CSS gradient for the two-tone progress bar effect.
+    progressBar.style.background = `linear-gradient(to right, #4CAF50 ${percent}%, #E0E0E0 ${percent}%)`;
+  }
+  if (progressBarFill) {
+    // The inner fill element is no longer needed with the gradient approach.
+    progressBarFill.style.display = 'none';
+  }
+
+  // Display the progress as a fraction, e.g., "3/12".
+  progressText.textContent = `${completed}/${total}`;
+
   sessionsList.innerHTML = '';
   const userSessions = state.currentUser.sessions || [];
   for (let idx = 0; idx < total; idx++) {
     const session = userSessions[idx];
     const li = document.createElement('li');
-    if (session && session.completed) li.classList.add('completed');
+    if (session && session.completed) {
+      li.classList.add('completed');
+    }
     const icon = document.createElement('span');
     icon.className = 'session-icon';
     icon.textContent = (session && session.completed) ? '✔️' : '○';
@@ -1313,13 +1334,10 @@ async function handleDeleteUser(event) {
   }
 }
 
-function buildAgenda() {
-    // Implementation for building agenda
-}
-
 function updateAgenda() {
-  buildAgenda();
-  setTimeout(() => {
+  // This function's only job is to initialize the calendar.
+  // The view is already made visible by the showView function.
+  setTimeout(() => { // setTimeout is good practice to let the DOM update before heavy calendar rendering.
     initCalendar();
     setupAgendaControls();
     if (eventListEl) {
@@ -1327,7 +1345,6 @@ function updateAgenda() {
     }
     updateCalendarTitle();
   }, 0);
-  showView('agenda');
 }
 
 function initCalendar() {
