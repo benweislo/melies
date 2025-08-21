@@ -899,31 +899,44 @@ function hideModal(modal) {
 
 function showView(name) {
   state.activeView = name;
+
+  // Hide all views first
   homeView.classList.add('hidden');
   coursesView.classList.add('hidden');
   mentoringView.classList.add('hidden');
   adminView.classList.add('hidden');
   if (agendaView) agendaView.classList.add('hidden');
+
+  // Deactivate all sidebar buttons
   document.querySelectorAll('.sidebar-btn').forEach(btn => btn.classList.remove('active'));
+
+  // Show the correct view and build its content
   switch (name) {
     case 'home':
       homeView.classList.remove('hidden');
       break;
     case 'courses':
       coursesView.classList.remove('hidden');
-      navCoursesBtn.classList.add('active');
+      if(navCoursesBtn) navCoursesBtn.classList.add('active');
+      // buildCurriculum() is called on login, which is sufficient for now.
       break;
     case 'mentoring':
       mentoringView.classList.remove('hidden');
-      navMentoringBtn.classList.add('active');
+      if(navMentoringBtn) navMentoringBtn.classList.add('active');
+      updateMentoring(); // Call the build function
       break;
     case 'admin':
       adminView.classList.remove('hidden');
-      navAdminBtn.classList.add('active');
+      if(navAdminBtn) navAdminBtn.classList.add('active');
+      buildUserList();    // Call the build function for users
+      buildAdminList();   // Call the build function for modules
       break;
     case 'agenda':
-      agendaView.classList.remove('hidden');
-      navAgendaBtn.classList.add('active');
+      if (agendaView) {
+        agendaView.classList.remove('hidden');
+        if(navAgendaBtn) navAgendaBtn.classList.add('active');
+        updateAgenda(); // Call the function that initializes the calendar
+      }
       break;
   }
 }
@@ -947,11 +960,14 @@ function updateAfterLogin() {
       adminNavLi.classList.add('hidden');
       if (mobileAdminLi) mobileAdminLi.classList.add('hidden');
     }
+
+    // Set the initial view, which will trigger the build functions via the new showView
     if (state.currentUser.role === 'admin') {
       showView('admin');
     } else {
       showView('courses');
     }
+
     if (state.currentUser.role === 'admin') {
       addModuleBtn.style.display = '';
     } else {
@@ -964,15 +980,15 @@ function updateAfterLogin() {
         createEventBtn.classList.add('hidden');
       }
     }
-    buildAgenda();
-    buildUserList();
+    // The build functions are now called by showView, so no need to call them here.
+    // We only need to build the curriculum once on login.
+    buildCurriculum();
   } else {
     if (userInfoEl) userInfoEl.classList.add('hidden');
     applyBtn.style.display = '';
     homeLoginBtn.style.display = '';
     sidebar.classList.add('hidden');
     showView('home');
-    buildUserList();
   }
 }
 
@@ -1569,16 +1585,10 @@ if (changeAccountBtn) {
 }
 
 navCoursesBtn.addEventListener('click', () => showView('courses'));
-navMentoringBtn.addEventListener('click', () => {
-  showView('mentoring');
-  updateMentoring();
-});
+navMentoringBtn.addEventListener('click', () => showView('mentoring'));
 navAdminBtn.addEventListener('click', () => showView('admin'));
-
 if (navAgendaBtn) {
-  navAgendaBtn.addEventListener('click', () => {
-    updateAgenda();
-  });
+  navAgendaBtn.addEventListener('click', () => showView('agenda'));
 }
 
 if (mobileNavAgenda) {
