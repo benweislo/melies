@@ -404,7 +404,7 @@ let modules = [
             <li>Masterclass : how to be imperfect</li>
           </ul>
         `,
-        video: 'https://player.vimeo.com/video/935849934',
+        video: 'https://www.youtube.com/embed/ia18lVQMuCg',
         pdfDesc: '',
         pdfUrl: '',
         poster: 'thumbnail.jpg',
@@ -1060,42 +1060,42 @@ function loadChapter(module, chapter) {
   videoContainer.innerHTML = ''; // Clear previous content
 
   // --- Robust Video Loading ---
-  if (chapter.video && chapter.video.includes('vimeo')) {
-    const videoId = chapter.video.split('/').pop().split('?')[0];
+  if (chapter.video && chapter.video.includes('youtube.com/embed')) {
     const iframe = document.createElement('iframe');
-    iframe.src = `https://player.vimeo.com/video/${videoId}?badge=0&autopause=0&player_id=0&app_id=58479&playsinline=1`;
+    iframe.src = chapter.video;
     iframe.frameBorder = '0';
-    iframe.allow = 'autoplay; fullscreen; picture-in-picture; clipboard-write';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    iframe.allowFullscreen = true;
     iframe.style.position = 'absolute';
     iframe.style.top = '0';
     iframe.style.left = '0';
     iframe.style.width = '100%';
     iframe.style.height = '100%';
-    iframe.title = chapter.title; // Dynamic title for accessibility
+    iframe.title = chapter.title;
 
     const iframeContainer = document.createElement('div');
     iframeContainer.style.padding = '56.25% 0 0 0';
     iframeContainer.style.position = 'relative';
     iframeContainer.appendChild(iframe);
     videoContainer.appendChild(iframeContainer);
+  } else if (chapter.video && chapter.video.includes('vimeo.com')) {
+    const iframe = document.createElement('iframe');
+    iframe.src = chapter.video;
+    iframe.frameBorder = '0';
+    iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+    iframe.allowFullscreen = true;
+    iframe.style.position = 'absolute';
+    iframe.style.top = '0';
+    iframe.style.left = '0';
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.title = chapter.title;
 
-    const initVimeoPlayer = () => {
-      const player = new Vimeo.Player(iframe);
-      player.on('error', (error) => {
-        console.error('Vimeo Player Error:', error);
-        videoContainer.innerHTML = `<div class="video-error"><p>Sorry, the video could not be loaded. Please try again later.</p></div>`;
-      });
-    };
-
-    if (window.Vimeo) {
-      initVimeoPlayer();
-    } else {
-      // The script is now loaded in index.html, but we can keep this as a fallback.
-      const vimeoScript = document.createElement('script');
-      vimeoScript.src = 'https://player.vimeo.com/api/player.js';
-      vimeoScript.onload = initVimeoPlayer;
-      document.body.appendChild(vimeoScript);
-    }
+    const vimeoContainer = document.createElement('div');
+    vimeoContainer.style.padding = '56.25% 0 0 0';
+    vimeoContainer.style.position = 'relative';
+    vimeoContainer.appendChild(iframe);
+    videoContainer.appendChild(vimeoContainer);
   } else if (chapter.video) {
     const videoEl = document.createElement('video');
     videoEl.id = 'course-video';
