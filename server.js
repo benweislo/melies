@@ -38,19 +38,29 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
-      scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://api.vimeo.com"],
-      mediaSrc: ["'self'", "https://player.vimeo.com", "https://vimeo.com"]
+      scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://player.vimeo.com"],
+      imgSrc: ["'self'", "data:", "https:", "https://i.vimeocdn.com", "https://f.vimeocdn.com"],
+      connectSrc: ["'self'", "https://api.vimeo.com", "https://player.vimeo.com", "https://i.vimeocdn.com", "https://f.vimeocdn.com"],
+      mediaSrc: ["'self'", "https://player.vimeo.com", "https://vimeo.com"],
+      frameSrc: ["'self'", "https://player.vimeo.com", "https://vimeo.com"],
+      childSrc: ["'self'", "https://player.vimeo.com", "https://vimeo.com"]
     }
   }
 }));
 
 // CORS configuration
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://melies.herokuapp.com'] 
-    : ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
