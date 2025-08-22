@@ -933,3 +933,21 @@
 {"ip":"127.0.0.1","level":"info","message":"POST /api/auth/login","service":"melies-online","timestamp":"2025-08-22T14:28:11.495Z","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36"}
 {"environment":"development","level":"info","message":"Server running on port 3000","port":"3000","service":"melies-online","timestamp":"2025-08-22T14:28:48.077Z"}
 {"environment":"development","level":"info","message":"Server running on port 3000","port":"3000","service":"melies-online","timestamp":"2025-08-22T14:28:49.077Z"}
+{"environment":"development","level":"info","message":"Server running on port 3000","port":"3000","service":"melies-online","timestamp":"2025-08-22T14:52:47.006Z"}
+{"environment":"development","level":"info","message":"Server running on port 3000","port":"3000","service":"melies-online","timestamp":"2025-08-22T14:52:52.471Z"}
+{"environment":"development","level":"info","message":"Server running on port 3000","port":"3000","service":"melies-online","timestamp":"2025-08-22T14:53:12.955Z"}
+{"environment":"development","level":"info","message":"Server running on port 3000","port":"3000","service":"melies-online","timestamp":"2025-08-22T14:53:13.812Z"}
+{"environment":"development","level":"info","message":"Server running on port 3000","port":"3000","service":"melies-online","timestamp":"2025-08-22T14:53:27.371Z"}
+{"environment":"development","level":"info","message":"Server running on port 3000","port":"3000","service":"melies-online","timestamp":"2025-08-22T14:53:34.179Z"}
+{"environment":"development","level":"info","message":"Server running on port 3000","port":"3000","service":"melies-online","timestamp":"2025-08-22T14:53:34.936Z"}
+{"environment":"development","level":"info","message":"Server running on port 3000","port":"3000","service":"melies-online","timestamp":"2025-08-22T14:53:44.610Z"}
+{"ip":"127.0.0.1","level":"info","message":"GET /","service":"melies-online","timestamp":"2025-08-22T14:53:53.932Z","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /style.css","service":"melies-online","timestamp":"2025-08-22T14:53:54.062Z","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /campus.jpg","service":"melies-online","timestamp":"2025-08-22T14:53:54.066Z","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /script.js","service":"melies-online","timestamp":"2025-08-22T14:53:54.108Z","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /hero.png","service":"melies-online","timestamp":"2025-08-22T14:53:54.344Z","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /fonts/Louis%20George%20Cafe.ttf","service":"melies-online","timestamp":"2025-08-22T14:53:54.365Z","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"GET /fonts/Louis%20George%20Cafe%20Bold.ttf","service":"melies-online","timestamp":"2025-08-22T14:53:54.446Z","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36"}
+{"ip":"127.0.0.1","level":"info","message":"POST /api/auth/login","service":"melies-online","timestamp":"2025-08-22T14:53:55.116Z","userAgent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.7339.16 Safari/537.36"}
+{"environment":"development","level":"info","message":"Server running on port 3000","port":"3000","service":"melies-online","timestamp":"2025-08-22T14:55:40.588Z"}
+{"environment":"development","level":"info","message":"Server running on port 3000","port":"3000","service":"melies-online","timestamp":"2025-08-22T14:55:41.558Z"}
