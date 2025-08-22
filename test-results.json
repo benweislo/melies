@@ -1,0 +1,409 @@
+{
+  "config": {
+    "configFile": "/app/playwright.config.js",
+    "rootDir": "/app/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 2
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/app/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 2
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/app/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.spec\\.js/"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.0",
+    "workers": 2,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "e2e.spec.js",
+      "file": "e2e.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Melies Online E2E Tests",
+          "file": "e2e.spec.js",
+          "line": 27,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "Authentication and Navigation",
+              "file": "e2e.spec.js",
+              "line": 41,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "should show the home page on initial load",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 715,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-22T09:40:56.382Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "616cc0f313d283bb66d2-7e48f9d160a367a0fac2",
+                  "file": "e2e.spec.js",
+                  "line": 42,
+                  "column": 5
+                },
+                {
+                  "title": "should allow a student to log in and see the courses view",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 1,
+                          "status": "passed",
+                          "duration": 937,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-22T09:40:56.379Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "616cc0f313d283bb66d2-b68a697a689a9221713e",
+                  "file": "e2e.spec.js",
+                  "line": 47,
+                  "column": 5
+                },
+                {
+                  "title": "should allow an admin to log in and see the admin view",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 782,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-22T09:40:57.296Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "616cc0f313d283bb66d2-cce04f3f6bbed2122c4b",
+                  "file": "e2e.spec.js",
+                  "line": 59,
+                  "column": 5
+                }
+              ]
+            },
+            {
+              "title": "Course Video Player",
+              "file": "e2e.spec.js",
+              "line": 72,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "should load and display the Vimeo video preview",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 1,
+                          "status": "failed",
+                          "duration": 21013,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('.video-container iframe').contentFrame().locator('.vp-player')\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  20000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for locator('.video-container iframe').contentFrame().locator('.vp-player')\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('.video-container iframe').contentFrame().locator('.vp-player')\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  20000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for locator('.video-container iframe').contentFrame().locator('.vp-player')\u001b[22m\n\n    at /app/tests/e2e.spec.js:93:50",
+                            "location": {
+                              "file": "/app/tests/e2e.spec.js",
+                              "column": 50,
+                              "line": 93
+                            },
+                            "snippet": "  91 |\n  92 |       const iframe = page.frameLocator('.video-container iframe');\n> 93 |       await expect(iframe.locator('.vp-player')).toBeVisible({ timeout: 20000 });\n     |                                                  ^\n  94 |       await expect(page.locator('.video-error')).not.toBeVisible();\n  95 |     });\n  96 |   });"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/app/tests/e2e.spec.js",
+                                "column": 50,
+                                "line": 93
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('.video-container iframe').contentFrame().locator('.vp-player')\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  20000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for locator('.video-container iframe').contentFrame().locator('.vp-player')\u001b[22m\n\n\n  91 |\n  92 |       const iframe = page.frameLocator('.video-container iframe');\n> 93 |       await expect(iframe.locator('.vp-player')).toBeVisible({ timeout: 20000 });\n     |                                                  ^\n  94 |       await expect(page.locator('.video-error')).not.toBeVisible();\n  95 |     });\n  96 |   });\n    at /app/tests/e2e.spec.js:93:50"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-22T09:40:57.524Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/app/test-results/e2e-Melies-Online-E2E-Test-fba80-lay-the-Vimeo-video-preview-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/app/tests/e2e.spec.js",
+                            "column": 50,
+                            "line": 93
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "616cc0f313d283bb66d2-2c154595445e00940b66",
+                  "file": "e2e.spec.js",
+                  "line": 73,
+                  "column": 5
+                }
+              ]
+            },
+            {
+              "title": "Mentorat Board",
+              "file": "e2e.spec.js",
+              "line": 98,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "should display session cards from the mock API",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 10813,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('.session-card').first()\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('.session-card').first()\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('.session-card').first()\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('.session-card').first()\u001b[22m\n\n    at /app/tests/e2e.spec.js:125:59",
+                            "location": {
+                              "file": "/app/tests/e2e.spec.js",
+                              "column": 59,
+                              "line": 125
+                            },
+                            "snippet": "  123 |     \n  124 |     test('should display session cards from the mock API', async ({ page }) => {\n> 125 |       await expect(page.locator('.session-card').first()).toBeVisible({ timeout: 10000 });\n      |                                                           ^\n  126 |       await expect(page.locator('.session-card')).toHaveCount(2);\n  127 |       await expect(page.locator('.session-card').first()).toContainText('Planning');\n  128 |     });"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/app/tests/e2e.spec.js",
+                                "column": 59,
+                                "line": 125
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('.session-card').first()\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('.session-card').first()\u001b[22m\n\n\n  123 |     \n  124 |     test('should display session cards from the mock API', async ({ page }) => {\n> 125 |       await expect(page.locator('.session-card').first()).toBeVisible({ timeout: 10000 });\n      |                                                           ^\n  126 |       await expect(page.locator('.session-card')).toHaveCount(2);\n  127 |       await expect(page.locator('.session-card').first()).toContainText('Planning');\n  128 |     });\n    at /app/tests/e2e.spec.js:125:59"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-22T09:40:58.120Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/app/test-results/e2e-Melies-Online-E2E-Test-94efc-ion-cards-from-the-mock-API-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/app/tests/e2e.spec.js",
+                            "column": 59,
+                            "line": 125
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "616cc0f313d283bb66d2-3f90ac276be9dbf71861",
+                  "file": "e2e.spec.js",
+                  "line": 124,
+                  "column": 5
+                },
+                {
+                  "title": "should filter sessions by search term",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "chromium",
+                      "projectName": "chromium",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 5871,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('.session-card').first()\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.session-card').first()\u001b[22m\n",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('.session-card').first()\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.session-card').first()\u001b[22m\n\n    at /app/tests/e2e.spec.js:131:59",
+                            "location": {
+                              "file": "/app/tests/e2e.spec.js",
+                              "column": 59,
+                              "line": 131
+                            },
+                            "snippet": "  129 |     \n  130 |     test('should filter sessions by search term', async ({ page }) => {\n> 131 |       await expect(page.locator('.session-card').first()).toBeVisible();\n      |                                                           ^\n  132 |         \n  133 |       await page.locator('#filter-search').fill('Planning');\n  134 |       await expect(page.locator('.session-card')).toHaveCount(1);"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/app/tests/e2e.spec.js",
+                                "column": 59,
+                                "line": 131
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('.session-card').first()\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.session-card').first()\u001b[22m\n\n\n  129 |     \n  130 |     test('should filter sessions by search term', async ({ page }) => {\n> 131 |       await expect(page.locator('.session-card').first()).toBeVisible();\n      |                                                           ^\n  132 |         \n  133 |       await page.locator('#filter-search').fill('Planning');\n  134 |       await expect(page.locator('.session-card')).toHaveCount(1);\n    at /app/tests/e2e.spec.js:131:59"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-08-22T09:41:10.019Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/app/test-results/e2e-Melies-Online-E2E-Test-ad12f-ter-sessions-by-search-term-chromium/error-context.md"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/app/tests/e2e.spec.js",
+                            "column": 59,
+                            "line": 131
+                          }
+                        }
+                      ],
+                      "status": "unexpected"
+                    }
+                  ],
+                  "id": "616cc0f313d283bb66d2-6c9bde1cbe1d9e81c1e6",
+                  "file": "e2e.spec.js",
+                  "line": 130,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-08-22T09:40:55.348Z",
+    "duration": 23287.089999999997,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 3,
+    "flaky": 0
+  }
+}
