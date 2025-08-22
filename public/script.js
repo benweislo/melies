@@ -404,7 +404,7 @@ let modules = [
             <li>Masterclass : how to be imperfect</li>
           </ul>
         `,
-        video: 'https://www.youtube.com/embed/ia18lVQMuCg',
+        video: 'https://player.vimeo.com/video/935849934',
         pdfDesc: '',
         pdfUrl: '',
         poster: 'thumbnail.jpg',
@@ -1057,61 +1057,43 @@ function loadChapter(module, chapter) {
   moduleNameEl.textContent = `${t.modulePrefix} ${module.id}: ${module.name}`;
 
   const videoContainer = document.querySelector('.video-container');
-  videoContainer.innerHTML = ''; // Clear previous content
+  videoContainer.innerHTML = ''; // Clear previous video/iframe
 
-  // --- Robust Video Loading ---
-  if (chapter.video && chapter.video.includes('youtube.com/embed')) {
-    const iframe = document.createElement('iframe');
-    iframe.src = chapter.video;
-    iframe.frameBorder = '0';
-    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-    iframe.allowFullscreen = true;
-    iframe.style.position = 'absolute';
-    iframe.style.top = '0';
-    iframe.style.left = '0';
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-    iframe.title = chapter.title;
+  if (chapter.video) {
+    if (chapter.video.includes('vimeo')) {
+      // It's a Vimeo video, use the more robust user-provided embed code structure.
+      const videoId = chapter.video.split('/').pop().split('?')[0]; // Get ID from URL
+      const embedCode = `
+        <div style="padding:56.25% 0 0 0;position:relative;">
+          <iframe
+            src="https://player.vimeo.com/video/${videoId}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+            frameborder="0"
+            allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+            style="position:absolute;top:0;left:0;width:100%;height:100%;"
+            title="Masterclass : How To Be Imperfect in animation">
+          </iframe>
+        </div>
+      `;
+      videoContainer.innerHTML = embedCode;
 
-    const iframeContainer = document.createElement('div');
-    iframeContainer.style.padding = '56.25% 0 0 0';
-    iframeContainer.style.position = 'relative';
-    iframeContainer.appendChild(iframe);
-    videoContainer.appendChild(iframeContainer);
-  } else if (chapter.video && chapter.video.includes('vimeo.com')) {
-    const iframe = document.createElement('iframe');
-    iframe.src = chapter.video;
-    iframe.frameBorder = '0';
-    iframe.allow = 'autoplay; fullscreen; picture-in-picture';
-    iframe.allowFullscreen = true;
-    iframe.style.position = 'absolute';
-    iframe.style.top = '0';
-    iframe.style.left = '0';
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-    iframe.title = chapter.title;
-
-    const vimeoContainer = document.createElement('div');
-    vimeoContainer.style.padding = '56.25% 0 0 0';
-    vimeoContainer.style.position = 'relative';
-    vimeoContainer.appendChild(iframe);
-    videoContainer.appendChild(vimeoContainer);
-  } else if (chapter.video) {
-    const videoEl = document.createElement('video');
-    videoEl.id = 'course-video';
-    videoEl.controls = true;
-    videoEl.src = chapter.video;
-    videoEl.poster = chapter.poster || 'thumbnail.jpg';
-    videoEl.preload = 'metadata';
-    videoEl.playsInline = true;
-    videoContainer.appendChild(videoEl);
-
-    videoEl.addEventListener('error', (e) => {
-      console.error('Video Error:', e);
-      videoContainer.innerHTML = `<div class="video-error"><p>Sorry, the video could not be loaded. Please try again later.</p></div>`;
-    });
-    videoEl.load();
+      // Ensure the Vimeo player API script is loaded
+      if (!document.querySelector('script[src="https://player.vimeo.com/api/player.js"]')) {
+        const vimeoScript = document.createElement('script');
+        vimeoScript.src = 'https://player.vimeo.com/api/player.js';
+        document.body.appendChild(vimeoScript);
+      }
+    } else {
+      // It's a direct video link, use the video tag
+      const videoEl = document.createElement('video');
+      videoEl.id = 'course-video';
+      videoEl.controls = true;
+      videoEl.src = chapter.video;
+      videoEl.poster = chapter.poster || 'thumbnail.jpg';
+      videoContainer.appendChild(videoEl);
+      videoEl.load();
+    }
   } else {
+    // No video, show the chapter poster as a placeholder
     const posterImage = document.createElement('img');
     posterImage.src = chapter.poster || 'thumbnail.jpg';
     posterImage.style.width = '100%';
@@ -1231,15 +1213,10 @@ function setupFilterEventListeners() {
     // Use a flag to ensure listeners are only added once
     if (mentoringControls.dataset.listenersAttached) return;
 
-    const changeFilters = [filterStartDate, filterEndDate, filterMentor, filterStudent];
-    changeFilters.forEach(filter => {
-        if (filter) filter.addEventListener('change', fetchAndRenderSessions);
+    const filters = [filterStartDate, filterEndDate, filterMentor, filterStudent, filterSearch];
+    filters.forEach(filter => {
+        if(filter) filter.addEventListener('change', fetchAndRenderSessions);
     });
-
-    if (filterSearch) {
-        filterSearch.addEventListener('input', fetchAndRenderSessions);
-    }
-
     mentoringControls.dataset.listenersAttached = 'true';
 }
 
@@ -1275,11 +1252,9 @@ async function populateAdminFilters() {
 }
 
 async function fetchAndRenderSessions() {
-    const board = document.getElementById('sessions-board');
-    const emptyState = document.getElementById('sessions-empty');
-
-    renderSkeletonLoaders(6);
-    emptyState.classList.add('hidden');
+    sessionsTable.classList.add('hidden');
+    sessionsEmpty.classList.add('hidden');
+    sessionsLoading.classList.remove('hidden');
 
     const token = localStorage.getItem('token');
     const params = new URLSearchParams({
@@ -1297,81 +1272,63 @@ async function fetchAndRenderSessions() {
         if (!response.ok) throw new Error('Failed to fetch sessions');
 
         const { sessions } = await response.json();
-        renderSessionsBoard(sessions);
+        renderSessionsTable(sessions);
     } catch (error) {
         console.error("Error fetching sessions:", error);
-        board.innerHTML = `<p>Error loading sessions.</p>`;
+        sessionsContainer.innerHTML = `<p>Error loading sessions.</p>`;
+    } finally {
+        sessionsLoading.classList.add('hidden');
     }
 }
 
-function renderSessionsBoard(sessions) {
-    const board = document.getElementById('sessions-board');
-    const emptyState = document.getElementById('sessions-empty');
-    board.innerHTML = '';
-
+function renderSessionsTable(sessions) {
+    sessionsTableBody.innerHTML = '';
     if (sessions.length === 0) {
-        emptyState.classList.remove('hidden');
+        sessionsEmpty.classList.remove('hidden');
+        sessionsTable.classList.add('hidden');
         return;
     }
 
-    emptyState.classList.add('hidden');
     const users = userCache.all;
     const findName = (id) => users.find(u => u.id === id)?.username || 'Unknown';
     const t = translations[state.currentLang];
 
     sessions.forEach(session => {
-        const card = document.createElement('div');
-        card.className = 'session-card';
-        card.dataset.sessionId = session.id;
+        const row = document.createElement('tr');
+        row.dataset.sessionId = session.id;
 
-        const userIsStudent = state.currentUser.role === 'student';
-        const userIsTeacher = state.currentUser.role === 'teacher';
-        const userIsAdmin = state.currentUser.role === 'admin';
-
-        let personOfInterest;
-        if (userIsStudent) {
-            personOfInterest = `<strong>Mentor:</strong> ${findName(session.mentorId)}`;
-        } else if (userIsTeacher) {
-            personOfInterest = `<strong>Student:</strong> ${findName(session.studentId)}`;
-        } else {
-            personOfInterest = `
-                <p><strong>Mentor:</strong> ${findName(session.mentorId)}</p>
-                <p><strong>Student:</strong> ${findName(session.studentId)}</p>
-            `;
-        }
-
-        card.innerHTML = `
-          <div class="card-header">
-            <span>${new Date(session.date).toLocaleDateString(state.currentLang, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-            <span class="status-badge status-${session.status}">${session.status}</span>
-          </div>
-          <div class="card-body">
-            <h4>${session.title}</h4>
-            ${personOfInterest}
-            <p><strong>Time:</strong> ${session.startTime || 'N/A'}</p>
-          </div>
-          <div class="card-footer"></div>
+        row.innerHTML = `
+            <td>${session.date}</td>
+            <td>${session.startTime} - ${session.endTime}</td>
+            <td>${findName(session.studentId)}</td>
+            <td>${findName(session.mentorId)}</td>
+            <td>${session.title}</td>
+            <td><span class="status-${session.status}">${session.status}</span></td>
+            <td class="actions"></td>
         `;
 
-        const actionsContainer = card.querySelector('.card-footer');
-        const canMutate = userIsAdmin || (userIsTeacher && state.currentUser.id === session.mentorId);
+        const actionsCell = row.querySelector('.actions');
+        const canMutate = (state.currentUser.role === 'admin' || (state.currentUser.role === 'teacher' && state.currentUser.id === session.mentorId));
 
         if (canMutate) {
             const editBtn = document.createElement('button');
             editBtn.textContent = t.edit;
-            editBtn.className = 'secondary-btn edit-session-btn';
-            editBtn.onclick = (event) => handleEditSession(session, event);
-            actionsContainer.appendChild(editBtn);
+            editBtn.className = 'edit-session-btn';
+            editBtn.onclick = () => handleEditSession(session);
+            actionsCell.appendChild(editBtn);
 
             const deleteBtn = document.createElement('button');
             deleteBtn.textContent = t.delete;
-            deleteBtn.className = 'secondary-btn delete-session-btn';
-            deleteBtn.onclick = (event) => handleDeleteSession(session.id, event);
-            actionsContainer.appendChild(deleteBtn);
+            deleteBtn.className = 'delete-session-btn';
+            deleteBtn.onclick = () => handleDeleteSession(session.id);
+            actionsCell.appendChild(deleteBtn);
         }
 
-        board.appendChild(card);
+        sessionsTableBody.appendChild(row);
     });
+
+    sessionsTable.classList.remove('hidden');
+    sessionsEmpty.classList.add('hidden');
 }
 
 // --- CRUD Handlers for Sessions ---
