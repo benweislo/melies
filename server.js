@@ -37,12 +37,12 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com", "data:"],
       scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://player.vimeo.com"],
       imgSrc: ["'self'", "data:", "https:", "https://i.vimeocdn.com", "https://f.vimeocdn.com"],
       connectSrc: ["'self'", "https://api.vimeo.com", "https://player.vimeo.com", "https://i.vimeocdn.com", "https://f.vimeocdn.com"],
       mediaSrc: ["'self'", "https://player.vimeo.com", "https://vimeo.com"],
-      frameSrc: ["'self'", "https://player.vimeo.com", "https://vimeo.com"],
+      frameSrc: ["'self'", "https://player.vimeo.com", "https://vimeo.com", "https://www.youtube.com"],
       childSrc: ["'self'", "https://player.vimeo.com", "https://vimeo.com"]
     }
   }
