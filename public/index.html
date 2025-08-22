@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="style.css" />
   <!-- FullCalendar CSS and JS for Agenda view (replicates Google Calendar features) -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
-  <script src="https://player.vimeo.com/api/player.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js" defer></script>
   <!-- Font Awesome for official icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -153,9 +152,23 @@
 
       <!-- Sessions Display Area -->
       <div id="sessions-container" class="sessions-container">
-        <div id="sessions-board" class="sessions-board">
-          <!-- Session cards or skeleton loaders will be injected here -->
-        </div>
+        <div id="sessions-loading" class="loading-state">Chargement des sessions...</div>
+        <table id="sessions-table" class="sessions-table hidden">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Heure</th>
+              <th>Étudiant</th>
+              <th>Mentor</th>
+              <th>Titre</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="sessions-table-body">
+            <!-- Session rows will be injected here by JavaScript -->
+          </tbody>
+        </table>
         <div id="sessions-empty" class="empty-state hidden">
           <p>Aucune session trouvée pour les filtres sélectionnés.</p>
         </div>
