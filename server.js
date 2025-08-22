@@ -55,13 +55,15 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+      return callback(new Error(msg), false);
     }
+    return callback(null, true);
   },
-  credentials: true
+  credentials: true,
 }));
 
 // Rate limiting
@@ -132,6 +134,18 @@ app.get('/api/health', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
+  // Specifically handle CORS errors to prevent them from becoming 500s
+  if (err.message.includes('The CORS policy for this site does not allow access')) {
+    logger.warn('CORS Error', {
+      message: err.message,
+      origin: req.headers.origin,
+      url: req.url,
+      method: req.method,
+      ip: req.ip,
+    });
+    return res.status(403).json({ error: 'Not allowed by CORS' });
+  }
+
   logger.error('Unhandled error:', {
     error: err.message,
     stack: err.stack,
