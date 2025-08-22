@@ -404,7 +404,7 @@ let modules = [
             <li>Masterclass : how to be imperfect</li>
           </ul>
         `,
-        video: 'https://player.vimeo.com/video/935849934',
+        video: 'https://www.youtube.com/embed/ia18lVQMuCg',
         pdfDesc: '',
         pdfUrl: '',
         poster: 'thumbnail.jpg',
@@ -1059,39 +1059,50 @@ function loadChapter(module, chapter) {
   const videoContainer = document.querySelector('.video-container');
   videoContainer.innerHTML = ''; // Clear previous video/iframe
 
-  if (chapter.video) {
-    if (chapter.video.includes('vimeo')) {
-      // It's a Vimeo video, use the more robust user-provided embed code structure.
-      const videoId = chapter.video.split('/').pop().split('?')[0]; // Get ID from URL
-      const embedCode = `
-        <div style="padding:56.25% 0 0 0;position:relative;">
-          <iframe
-            src="https://player.vimeo.com/video/${videoId}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
-            frameborder="0"
-            allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
-            style="position:absolute;top:0;left:0;width:100%;height:100%;"
-            title="Masterclass : How To Be Imperfect in animation">
-          </iframe>
-        </div>
-      `;
-      videoContainer.innerHTML = embedCode;
+  if (chapter.video && chapter.video.includes('youtube.com/embed')) {
+    const iframe = document.createElement('iframe');
+    iframe.src = chapter.video;
+    iframe.frameBorder = '0';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    iframe.allowFullscreen = true;
+    iframe.style.position = 'absolute';
+    iframe.style.top = '0';
+    iframe.style.left = '0';
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.title = chapter.title;
 
-      // Ensure the Vimeo player API script is loaded
-      if (!document.querySelector('script[src="https://player.vimeo.com/api/player.js"]')) {
-        const vimeoScript = document.createElement('script');
-        vimeoScript.src = 'https://player.vimeo.com/api/player.js';
-        document.body.appendChild(vimeoScript);
-      }
-    } else {
-      // It's a direct video link, use the video tag
-      const videoEl = document.createElement('video');
-      videoEl.id = 'course-video';
-      videoEl.controls = true;
-      videoEl.src = chapter.video;
-      videoEl.poster = chapter.poster || 'thumbnail.jpg';
-      videoContainer.appendChild(videoEl);
-      videoEl.load();
-    }
+    const iframeContainer = document.createElement('div');
+    iframeContainer.style.padding = '56.25% 0 0 0';
+    iframeContainer.style.position = 'relative';
+    iframeContainer.appendChild(iframe);
+    videoContainer.appendChild(iframeContainer);
+  } else if (chapter.video && chapter.video.includes('vimeo.com')) {
+    const iframe = document.createElement('iframe');
+    iframe.src = chapter.video;
+    iframe.frameBorder = '0';
+    iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+    iframe.allowFullscreen = true;
+    iframe.style.position = 'absolute';
+    iframe.style.top = '0';
+    iframe.style.left = '0';
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.title = chapter.title;
+
+    const vimeoContainer = document.createElement('div');
+    vimeoContainer.style.padding = '56.25% 0 0 0';
+    vimeoContainer.style.position = 'relative';
+    vimeoContainer.appendChild(iframe);
+    videoContainer.appendChild(vimeoContainer);
+  } else if (chapter.video) {
+    const videoEl = document.createElement('video');
+    videoEl.id = 'course-video';
+    videoEl.controls = true;
+    videoEl.src = chapter.video;
+    videoEl.poster = chapter.poster || 'thumbnail.jpg';
+    videoContainer.appendChild(videoEl);
+    videoEl.load();
   } else {
     // No video, show the chapter poster as a placeholder
     const posterImage = document.createElement('img');
