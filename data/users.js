@@ -54,7 +54,12 @@ let users = [
     email: 'teacher1',
     password: '$2a$12$BDmszBInHeXyu9f1WbOSwe01N5dM0vv.y5SpYpGRcifgs/54HKspi', // Secret123
     role: 'teacher',
+<<<<<<< Updated upstream
     createdAt: new Date().toISOString(),
+=======
+    // FIX: was `new '2024-01-01T00:00:00.000Z'` (invalid)
+    createdAt: '2024-01-01T00:00:00.000Z',
+>>>>>>> Stashed changes
     lastLogin: null,
     isActive: true
   },
